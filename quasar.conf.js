@@ -12,7 +12,8 @@ module.exports = function (ctx) {
       'vuelidate',
       'local-storage',
       'moment',
-      'boot'
+      'boot',
+      'maps'
     ],
     css: [
       'app.styl'

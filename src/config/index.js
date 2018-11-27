@@ -29,6 +29,9 @@ export default {
       messagingSenderId: 'YOUR_FIREBASE_SENDER_ID'
     }
   },
+  googleApi: {
+    apiKey: 'AIzaSyDXrlvhIK9xv08TzQJ4rp5Ah1tKKj96x5k'
+  },
   language: {
     default: 'en-us',
     multilanguage: true,

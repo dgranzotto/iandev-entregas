@@ -6,6 +6,8 @@
       <q-input readonly v-model="$store.state.app.entregaAtual.descricao" />
       <q-input readonly v-model="$store.state.app.entregaAtual.subdescricao" />
       <q-item-separator />
+      <q-btn rounded color="primary" icon="directions" label="Visualizar Rota" size="md" class="full-width q-my-md" @click="visualizarRota" />
+      <q-item-separator />
       <q-list no-border striped class="q-mt-md dark-example">
         <div class="q-headline">Itens</div>
         <q-item v-for="(item, index) in $store.state.app.entregaAtual.itens" :key="index" @click.native="entregas(item)">
@@ -32,6 +34,9 @@ export default {
   },
   methods: {
     entregas () {
+    },
+    visualizarRota () {
+      this.$uiUtil.gotoPage(this, 'entregarota')
     }
   }
 }

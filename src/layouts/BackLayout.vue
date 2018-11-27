@@ -6,7 +6,7 @@
         :glossy="$q.theme === 'mat'"
         :inverted="$q.theme === 'ios'"
       >
-        <q-btn flat v-go-back=" '/' ">
+        <q-btn flat @click="$router.go(-1)">
           <q-icon name="arrow_back" />
         </q-btn>
         <q-toolbar-title>
