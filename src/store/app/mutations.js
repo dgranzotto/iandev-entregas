@@ -20,6 +20,10 @@ export const setEntregaAtual = (state, payload) => {
   state.entregaAtual = payload
 }
 
+export const setImagemAtual = (state, payload) => {
+  state.imagemAtual = payload
+}
+
 export const setLanguage = (state, payload) => {
   let setup = LocalStorage.get('setup')
   setup.language = payload
