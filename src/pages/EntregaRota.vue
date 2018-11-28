@@ -34,7 +34,7 @@ export default {
   methods: {
     getMapLocation () {
       const vm = this
-
+      vm.$q.loading.show()
       navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true })
 
       //  Callback functions
@@ -44,51 +44,62 @@ export default {
         vm.buildMapRoute()
       }
       function onMapError (error) {
-        console.log('code: ' + error.code + '\n' + 'message: ' + error.message + '\n')
+        vm.$q.loading.hide()
+        // console.log('code: ' + error.code + '\n' + 'message: ' + error.message + '\n')
+        vm.$uiUtil.showErrorMessage(error.message || 'Localização não encontrada.')
+        vm.$router.go(-1)
       }
     },
     buildMapRoute () {
-      var directionsService = new window.google.maps.DirectionsService()
-      var directionsDisplay = new window.google.maps.DirectionsRenderer()
+      const vm = this
+      var start = new window.google.maps.LatLng(vm.currentPosition.latitude, vm.currentPosition.longitude)
 
-      var start = new window.google.maps.LatLng(this.currentPosition.latitude, this.currentPosition.longitude)
-
-      var end
-      if (this.$store.state.app.entregaAtual.latitudeentrega !== null || this.$store.state.app.entregaAtual.longitudeentrega !== null) {
-        end = new window.google.maps.LatLng(this.$store.state.app.entregaAtual.latitudeentrega, this.$store.state.app.entregaAtual.longitudeentrega)
+      let end
+      if (vm.$store.state.app.entregaAtual.latitudeentrega !== null && vm.$store.state.app.entregaAtual.longitudeentrega !== null) {
+        end = new window.google.maps.LatLng(vm.$store.state.app.entregaAtual.latitudeentrega, vm.$store.state.app.entregaAtual.longitudeentrega)
+        build(start, end)
       } else {
         var geocoder = new window.google.maps.Geocoder()
-        var address = this.$store.state.app.entregaAtual.address
+        var address = vm.$store.state.app.entregaAtual.address
         geocoder.geocode({'address': address}, function (results, status) {
           if (status === 'OK') {
             let position = results[0].geometry.location
-            console.log(position)
-            end = new window.google.maps.LatLng(position.lat, position.lng)
+            end = new window.google.maps.LatLng(position.lat(), position.lng())
+            build(start, end)
           } else {
-            alert('Geocode was not successful for the following reason: ' + status)
+            vm.$q.loading.hide()
+            vm.$uiUtil.showErrorMessage(status || 'Localização não encontrada.')
+            vm.$router.go(-1)
           }
         })
       }
 
-      var mapOptions = {
-        zoom: 7,
-        center: start
-      }
+      function build (start, end) {
+        var directionsService = new window.google.maps.DirectionsService()
+        var directionsDisplay = new window.google.maps.DirectionsRenderer()
 
-      var map = new window.google.maps.Map(document.getElementById('map'), mapOptions)
-      directionsDisplay.setMap(map)
-
-      var request = {
-        origin: start,
-        destination: end,
-        travelMode: 'DRIVING'
-      }
-
-      directionsService.route(request, function (result, status) {
-        if (status === 'OK') {
-          directionsDisplay.setDirections(result)
+        var mapOptions = {
+          zoom: 7,
+          center: start
         }
-      })
+
+        var map = new window.google.maps.Map(document.getElementById('map'), mapOptions)
+        directionsDisplay.setMap(map)
+
+        var request = {
+          origin: start,
+          destination: end,
+          travelMode: 'DRIVING'
+        }
+
+        directionsService.route(request, function (result, status) {
+          if (status === 'OK') {
+            directionsDisplay.setDirections(result)
+          }
+        })
+
+        vm.$q.loading.hide()
+      }
     }
   }
 }

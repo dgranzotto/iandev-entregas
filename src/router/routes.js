@@ -14,7 +14,7 @@ const routes = [
     component: () => import('layouts/BackLayout.vue'),
     children: [
       { path: '/entrega', name: 'entrega', component: () => import('pages/Entrega.vue') },
-      { path: '/entrega/entregarota', name: 'entregarota', component: () => import('pages/EntregaRota.vue') },
+      { path: '/entregarota', name: 'entregarota', component: () => import('pages/EntregaRota.vue') },
       { path: '/about', name: 'about', component: () => import('pages/About.vue') }
     ]
   }
