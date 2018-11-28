@@ -9,6 +9,9 @@
   "installed_plugins": {
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova-plugin-geolocation": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
     }
   },
   "dependent_plugins": {}
