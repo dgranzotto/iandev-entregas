@@ -12,6 +12,18 @@
     },
     "cordova-plugin-geolocation": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova.plugins.diagnostic": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova-sqlite-storage": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova-plugin-file": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
     }
   },
   "dependent_plugins": {}
