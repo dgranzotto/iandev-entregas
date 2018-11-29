@@ -6,6 +6,7 @@
       <q-input readonly v-model="$store.state.app.entregaAtual.descricao" />
       <q-input readonly v-model="$store.state.app.entregaAtual.subdescricao" />
       <q-item-separator />
+      <q-select float-label="Selecione o tipo da ocorrência" v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" />
       <q-btn v-if="$store.state.app.entregaAtual.address || ($store.state.app.entregaAtual.latitudeentrega && $store.state.app.entregaAtual.longitudeentrega)" rounded color="primary" icon="directions" label="Visualizar Rota" size="md" class="full-width q-my-md" @click="visualizarRota" />
       <q-item-separator />
       <q-list no-border striped class="q-mt-md dark-example">
@@ -14,8 +15,11 @@
           <q-item-main>
             <q-item-tile label>{{ item.descricao }}</q-item-tile>
             <q-item-tile sublabel>Quantidade: {{ item.quantidade }}</q-item-tile>
+            <q-item-tile v-show="item.requerfoto == 'S'" label color="negative">Necessário tirar foto</q-item-tile>
           </q-item-main>
-          <q-item-side right icon="info" color="green" />
+          <q-item-side>
+            <q-btn round color="primary" icon="photo_camera" @click.native="tirarFoto(item)"/>
+          </q-item-side>
         </q-item>
       </q-list>
     </div>
@@ -30,10 +34,14 @@ export default {
   name: 'PageEntrega',
   data () {
     return {
+      motivoRetorno: null
     }
   },
   methods: {
     entregas () {
+    },
+    tirarFoto (item) {
+      this.$uiUtil.gotoPage(this, 'midias')
     },
     visualizarRota () {
       this.$uiUtil.gotoPage(this, 'entregarota')
