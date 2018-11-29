@@ -35,7 +35,7 @@ export default {
     getMapLocation () {
       const vm = this
       vm.$q.loading.show()
-      navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true })
+      navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true, timeout: 5000 })
 
       //  Callback functions
       function onMapSuccess (position) {
@@ -45,8 +45,12 @@ export default {
       }
       function onMapError (error) {
         vm.$q.loading.hide()
-        // console.log('code: ' + error.code + '\n' + 'message: ' + error.message + '\n')
-        vm.$uiUtil.showErrorMessage(error.message || 'Localização não encontrada.')
+        console.log('code: ' + error.code + '\n' + 'message: ' + error.message + '\n')
+        var message = ''
+        if (error.code === 3) {
+          message = 'Verifique se a localização do dispositivo está ativada e se há conexão'
+        }
+        vm.$uiUtil.showErrorMessage((message === '' ? error.message : message) || 'Localização não encontrada.')
         vm.$router.go(-1)
       }
     },
