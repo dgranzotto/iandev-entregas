@@ -3,7 +3,11 @@
     <div style="width: 500px; max-width: 90vw;">
       <q-input float-label="Descrição" type="textarea" />
     </div>
-    <img :src="$store.state.app.imagemAtual" />
+    <div class="row justify-center">
+      <div class="col-12">
+        <img style="height: 100%;width: 100%;" :src="$store.state.app.imagemAtual" />
+      </div>
+    </div>
     <q-page-sticky position="bottom-right" :offset="[40, 40]">
       <q-fab icon="delete_outline" direction="up" color="primary"></q-fab>
     </q-page-sticky>

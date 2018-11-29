@@ -1,10 +1,17 @@
 <template>
   <q-page class="flex flex-center">
     <!--<img alt="Quasar logo" src="~assets/quasar-logo-full.svg">-->
-    <img alt="App Logo" src="~assets/images/truck-blue.jpg">
-    <div style="width: 500px; max-width: 90vw;">
-      <q-btn rounded color="primary" icon="local_shipping" label="Entregas" size="lg" class="full-width q-my-md" @click="entregas" />
+    <div class="row justify-center">
+      <div class="col-xs-12">
+        <img alt="App Logo" src="~assets/images/truck-blue.jpg" />
+      </div>
+    </div>
+    <div class="row justify-center">
+      <div class="col-xs-12 q-pa-sm">
+        <q-btn rounded color="primary" icon="local_shipping" label="Entregas" size="lg" class="full-width q-my-md" @click="entregas" />
+      </div>
       <div class="row justify-center">
+        <div class="col-xs-6">
         <q-card inline class="bigger q-ma-sm">
           <q-card-title class="relative-position">
             <div class="text-faded s-size">Realizadas</div>
@@ -12,15 +19,18 @@
           <q-card-main>
             <q-knob v-model="numRealizadas" :min="0" :max="numEntregas" color="positive" size="80px" line-width="3px" ><div class="s-size">{{ numRealizadas }}</div></q-knob>
           </q-card-main>
-        </q-card>
-        <q-card inline class="bigger q-ma-sm">
-          <q-card-title class="relative-position">
-            <div class="text-faded s-size">Pendentes</div>
-          </q-card-title>
-          <q-card-main>
-            <q-knob v-model="numPendentes" :min="0" :max="numEntregas" color="negative" size="80px" line-width="3px" ><div class="s-size">{{ numPendentes }}</div></q-knob>
-          </q-card-main>
-        </q-card>
+         </q-card>
+        </div>
+        <div class="col-xs-6">
+          <q-card inline class="bigger q-ma-sm">
+            <q-card-title class="relative-position">
+              <div class="text-faded s-size">Pendentes</div>
+            </q-card-title>
+            <q-card-main>
+              <q-knob v-model="numPendentes" :min="0" :max="numEntregas" color="negative" size="80px" line-width="3px" ><div class="s-size">{{ numPendentes }}</div></q-knob>
+            </q-card-main>
+          </q-card>
+        </div>
       </div>
     </div>
   </q-page>

@@ -35,7 +35,19 @@ export default {
     getMapLocation () {
       const vm = this
       vm.$q.loading.show()
-      navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true, timeout: 5000 })
+
+      if (window.cordova) {
+        cordova.plugins.diagnostic.isLocationEnabled(function (enabled) {
+          if (!enabled) {
+            cordova.plugins.diagnostic.switchToLocationSettings()
+          }
+        }, function (error) {
+          console.log(error)
+          vm.$uiUtil.showErrorMessage('Não foi possível obter a informação sobre geolocalização')
+        })
+      }
+
+      navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true, timeout: 120000 })
 
       //  Callback functions
       function onMapSuccess (position) {
@@ -46,11 +58,7 @@ export default {
       function onMapError (error) {
         vm.$q.loading.hide()
         console.log('code: ' + error.code + '\n' + 'message: ' + error.message + '\n')
-        var message = ''
-        if (error.code === 3) {
-          message = 'Verifique se a localização do dispositivo está ativada e se há conexão'
-        }
-        vm.$uiUtil.showErrorMessage((message === '' ? error.message : message) || 'Localização não encontrada.')
+        vm.$uiUtil.showErrorMessage('Não foi possível obter a informação sobre geolocalização')
         vm.$router.go(-1)
       }
     },
@@ -72,7 +80,7 @@ export default {
             build(start, end)
           } else {
             vm.$q.loading.hide()
-            vm.$uiUtil.showErrorMessage(status || 'Localização não encontrada.')
+            vm.$uiUtil.showErrorMessage('Não foi possível obter a informação sobre geolocalização do endereço')
             vm.$router.go(-1)
           }
         })
@@ -83,7 +91,6 @@ export default {
         var directionsDisplay = new window.google.maps.DirectionsRenderer()
 
         var mapOptions = {
-          zoom: 7,
           center: start
         }
 
