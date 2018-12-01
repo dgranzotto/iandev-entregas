@@ -1,28 +1,60 @@
 <template>
-  <q-page class="flex flex-center">
-    <div style="width: 500px; max-width: 90vw;">
-      <div class="row">
-        <thumbnail class="shadow-box" v-for="(item, index) in $store.state.app.imagens" :key="index" :img="item" :width="65" :height="65" @click.native="editarImagem(item)"/>
+  <q-page class="flex flex-center" style="background-color:#4b4b4be0;">
+      <div style="width:100%">
+        <!-- <thumbnail class="shadow-box" v-for="(item, index) in $store.state.app.imagens" :key="index" :img="item" :width="50" :height="50" @click.native="editarImagem(item)"/> -->
+          <q-carousel @input="currentIndex" ref="carousel" :height="windowHeight" color="white" arrows :thumbnails="$store.state.app.imagens" thumbnails-horizontal>
+            <q-carousel-slide class="carousel-slide" v-for="(item, index) in $store.state.app.imagens" :img-src="item" :key="index"></q-carousel-slide>
+          </q-carousel>
       </div>
-      <q-page-sticky position="bottom-right" :offset="[40, 40]">
-         <q-btn round icon="add_a_photo" color="primary" @click="tirarFoto()"></q-btn>
+      <q-page-sticky position="top-left" :offset="[5, 5]">
+        <q-btn class="btn-carousel" round icon="add_a_photo" size="lg" @click="tirarFoto()"></q-btn>
       </q-page-sticky>
-    </div>
+      <q-page-sticky v-if="$store.state.app.imagens.length > 0" position="top-left" :offset="[80, 5]">
+        <q-btn class="btn-carousel" round icon="delete" size="lg" @click="excluirFoto()"></q-btn>
+      </q-page-sticky>
   </q-page>
 </template>
 
+<style lang="stylus">
+.btn-carousel {
+  color #FFFFFF;
+  background rgba(0, 0, 0, .3);
+}
+.carousel-slide {
+  background-color: #4b4b4be0;
+  background-size: contain !important;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+</style>
+
 <script>
-import Thumbnail from 'components/Thumbnail'
 export default {
-  components: {
-    Thumbnail
-  },
   name: 'PageMidias',
   data () {
     return {
+      windowHeight: 0,
+      carouselIndex: 0
     }
   },
   methods: {
+    currentIndex (index) {
+      this.carouselIndex = index
+    },
+    getWindowHeight () {
+      this.windowHeight = (window.innerHeight - 50) + 'px'
+    },
+    excluirFoto () {
+      this.$uiUtil.showConfirmDeleteMessage('Tem certeza de que deseja excluir a imagem atual?', 'Excluir imagem')
+        .then(() => {
+          this.$store.state.app.imagens.splice(this.carouselIndex, 1)
+          if (this.carouselIndex >= this.$store.state.app.imagens.length - 1) {
+            this.$refs.carousel.goToSlide(this.carouselIndex - 1)
+          }
+        }).catch(() => {
+          // do nothing
+        })
+    },
     editarImagem (imagem) {
       this.$store.commit('app/setImagemAtual', imagem)
       this.$uiUtil.gotoPage(this, 'imagem')
@@ -47,6 +79,7 @@ export default {
                         entry => { // on success
                           console.log(entry)
                           this.$store.state.app.imagens.push(entry.nativeURL)
+                          this.$refs.carousel.goToSlide(this.$store.state.app.imagens.length - 1)
                         }, (error) => { // on fail
                           console.log(error)
                         })
@@ -69,24 +102,17 @@ export default {
           encodingType: Camera.EncodingType.JPEG
         }
       )
-
-      /* var db = window.sqlitePlugin.openDatabase({
-        name: 'my.db',
-        location: 'default'
-      })
-
-       db.transaction(function (tx) {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS DemoTable (name, score)')
-        tx.executeSql('INSERT INTO DemoTable VALUES (?,?)', ['Alice', 101])
-      }, function (error) {
-        console.log('Transaction ERROR: ' + error.message)
-      }, function () {
-        console.log('Populated database OK')
-      }) */
     }
   },
   created () {
     // entregaServices.syncEntregas()
+    this.getWindowHeight()
+  },
+  mounted () {
+    this.$nextTick(function () {
+      window.addEventListener('resize', this.getWindowHeight)
+      // console.log(this.$refs.carousel.index())
+    })
   }
 }
 </script>
