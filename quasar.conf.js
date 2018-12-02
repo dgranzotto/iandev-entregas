@@ -58,6 +58,7 @@ module.exports = function (ctx) {
         'QToolbar',
         'QToolbarTitle',
         'QBtn',
+        'QBtnGroup',
         'QIcon',
         'QList',
         'QListHeader',
@@ -84,7 +85,8 @@ module.exports = function (ctx) {
         'QCardActions',
         'QProgress',
         'QKnob',
-        'QToggle'
+        'QToggle',
+        'QModal'
       ],
       directives: [
         'Ripple', 'GoBack'

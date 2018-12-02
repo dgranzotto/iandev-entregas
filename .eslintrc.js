@@ -22,7 +22,8 @@ module.exports = {
     'ga': true, // Google Analytics
     'cordova': true,
     '__statics': true,
-    'Camera': true
+    'Camera': true,
+    'Connection': true
   },
   // add your custom rules here
   'rules': {

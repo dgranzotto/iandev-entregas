@@ -8,7 +8,7 @@ export default {
     })
   },
   showSuccessMessage (message) {
-    Notify.create({ message, type: 'positive', position: 'center' })
+    Notify.create({ message, type: 'positive', position: 'center', timeout: 800 })
   },
   showErrorMessage (message, detail) {
     if (detail) {

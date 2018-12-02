@@ -25,6 +25,8 @@ export default {
       }
     }
   },
+  created () {
+  },
   async mounted () {
     await this.$google()
     this.$nextTick(function () {

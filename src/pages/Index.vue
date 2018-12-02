@@ -3,7 +3,7 @@
     <!--<img alt="Quasar logo" src="~assets/quasar-logo-full.svg">-->
     <div class="row justify-center">
       <div class="col-xs-12">
-        <img alt="App Logo" src="~assets/images/truck-blue.jpg" />
+        <img alt="App Logo" src="~assets/images/iandev-entregas.png" />
       </div>
     </div>
     <div class="row justify-center">
