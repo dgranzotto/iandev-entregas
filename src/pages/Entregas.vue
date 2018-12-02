@@ -20,6 +20,8 @@
 </style>
 
 <script>
+// import db from '../db/db'
+
 export default {
   name: 'PageEntregas',
   data () {
@@ -31,6 +33,31 @@ export default {
       this.$store.commit('app/setEntregaAtual', entregaAtual)
       this.$uiUtil.gotoPage(this, 'entrega')
     }
+  },
+  mounted () {
+    // db.createDB()
+    // db.transaction((tx) => {
+    //   db.entregaExists({ idcargaentrega: 111, idsaidaorigem: 12 }, tx, (exists) => {
+    //     console.log('--entregaExists 1/12: ' + exists)
+    //   }, (error) => {
+    //     console.log('--entregaExists error:' + JSON.stringify(error))
+    //   })
+    //   db.entregaExists({ idcargaentrega: 1111111, idsaidaorigem: 12 }, tx, (exists) => {
+    //     console.log('--entregaExists 1111111/12: ' + exists)
+    //   }, (error) => {
+    //     console.log('--entregaExists error:' + JSON.stringify(error))
+    //   })
+    //   db.getEntregas(tx, (entregas) => {
+    //     console.log('--getEntregas: ')
+    //     console.log(entregas)
+    //   }, (error) => {
+    //     console.log('--getEntregas error:' + JSON.stringify(error))
+    //   })
+    // }, (error) => {
+    //   console.log('--Transaction ERROR: ' + error.message)
+    // }, () => {
+    //   console.log('--Transaction OK')
+    // })
   }
 }
 </script>

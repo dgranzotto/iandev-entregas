@@ -7,22 +7,22 @@
     "files": {}
   },
   "installed_plugins": {
-    "cordova-plugin-whitelist": {
+    "cordova-plugin-camera": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova-plugin-file": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
     "cordova-plugin-geolocation": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
-    "cordova.plugins.diagnostic": {
-      "PACKAGE_NAME": "br.com.iandev.entregas"
-    },
-    "cordova-plugin-camera": {
+    "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
     "cordova-sqlite-storage": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
-    "cordova-plugin-file": {
+    "cordova.plugins.diagnostic": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     }
   },

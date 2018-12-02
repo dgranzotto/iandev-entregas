@@ -69,20 +69,6 @@ export default {
           encodingType: Camera.EncodingType.JPEG
         }
       )
-
-      /* var db = window.sqlitePlugin.openDatabase({
-        name: 'my.db',
-        location: 'default'
-      })
-
-       db.transaction(function (tx) {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS DemoTable (name, score)')
-        tx.executeSql('INSERT INTO DemoTable VALUES (?,?)', ['Alice', 101])
-      }, function (error) {
-        console.log('Transaction ERROR: ' + error.message)
-      }, function () {
-        console.log('Populated database OK')
-      }) */
     }
   },
   created () {
