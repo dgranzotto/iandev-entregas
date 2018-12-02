@@ -24,6 +24,9 @@
     },
     "cordova.plugins.diagnostic": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
+    "cordova-plugin-network-information": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
     }
   },
   "dependent_plugins": {}

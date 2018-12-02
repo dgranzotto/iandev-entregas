@@ -58,6 +58,7 @@ module.exports = function (ctx) {
         'QToolbar',
         'QToolbarTitle',
         'QBtn',
+        'QBtnGroup',
         'QIcon',
         'QList',
         'QListHeader',
@@ -73,6 +74,9 @@ module.exports = function (ctx) {
         'QPageSticky',
         'QFab',
         'QChip',
+        'QCarousel',
+        'QCarouselSlide',
+        'QCarouselControl',
         'QCard',
         'QCardTitle',
         'QCardMain',
@@ -80,7 +84,9 @@ module.exports = function (ctx) {
         'QCardSeparator',
         'QCardActions',
         'QProgress',
-        'QKnob'
+        'QKnob',
+        'QToggle',
+        'QModal'
       ],
       directives: [
         'Ripple', 'GoBack'
@@ -89,7 +95,8 @@ module.exports = function (ctx) {
       plugins: [
         'Notify',
         'LocalStorage',
-        'Loading'
+        'Loading',
+        'Dialog'
       ]
       // iconSet: ctx.theme.mat ? 'material-icons' : 'ionicons'
       // i18n: 'de' // Quasar language

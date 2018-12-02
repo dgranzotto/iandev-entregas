@@ -18,11 +18,19 @@ export const setEntregasLastAttempt = (state, status, message) => {
 }
 
 export const setEntregaAtual = (state, payload) => {
+  payload.itemAtual = { midias: [] }
+  if (!payload.ocorrencia) {
+    payload.ocorrencia = {}
+    for (var obj in state.entregaAtual.ocorrencia) {
+      payload.ocorrencia[obj] = null
+    }
+  }
   state.entregaAtual = payload
 }
 
-export const setImagemAtual = (state, payload) => {
-  state.imagemAtual = payload
+export const setItemAtual = (state, payload) => {
+  payload.midias = payload.midias || []
+  state.entregaAtual.itemAtual = payload
 }
 
 export const persistEntregas = (state) => {

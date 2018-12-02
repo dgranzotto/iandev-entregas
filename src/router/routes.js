@@ -15,7 +15,6 @@ const routes = [
     children: [
       { path: '/entrega', name: 'entrega', component: () => import('pages/Entrega.vue') },
       { path: '/midias', name: 'midias', component: () => import('pages/Midias.vue') },
-      { path: '/imagem', name: 'imagem', component: () => import('pages/Imagem.vue') },
       { path: '/entregarota', name: 'entregarota', component: () => import('pages/EntregaRota.vue') },
       { path: '/about', name: 'about', component: () => import('pages/About.vue') }
     ]

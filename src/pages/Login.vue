@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center">
     <!--<img alt="Quasar logo" src="~assets/quasar-logo-full.svg">-->
-    <img alt="App Logo" src="~assets/images/truck-blue.jpg">
+    <img alt="App Logo" src="~assets/images/iandev-entregas.png">
     <div style="width: 500px; max-width: 90vw;">
       <q-input v-model="formLogin.usr" float-label="Usuário" />
       <q-input v-model="formLogin.pwd" type="password" float-label="Senha" />
