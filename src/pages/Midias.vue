@@ -63,6 +63,7 @@ export default {
         .then(() => {
           this.$store.state.app.entregaAtual.itemAtual.midias.splice(this.carouselIndex, 1)
           if (this.carouselIndex >= this.$store.state.app.entregaAtual.itemAtual.midias.length - 1) {
+            this.updateThumbnails()
             this.$refs.carousel.goToSlide(this.carouselIndex - 1)
           }
         }).catch(() => {
@@ -112,7 +113,8 @@ export default {
         {
           quality: 50,
           destinationType: Camera.DestinationType.FILE_URI,
-          encodingType: Camera.EncodingType.JPEG
+          encodingType: Camera.EncodingType.JPEG,
+          correctOrientation: true
         }
       )
     }

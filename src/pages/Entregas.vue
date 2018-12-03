@@ -12,9 +12,9 @@
             <q-item-tile label>{{ item.descricao }}</q-item-tile>
             <q-item-tile sublabel>{{ item.subdescricao }}</q-item-tile>
           </q-item-main>
-          <q-item-side v-if="item.sync === 'true'" class="info-icon" right icon="" color="green" />
-          <q-item-side v-if="Boolean((item.ocorrencia ? item.ocorrencia.confirmaEntrega : false) === 'Sim')" class="info-icon" right icon="info" color="green" />
-          <q-item-side v-if="Boolean((item.ocorrencia ? item.ocorrencia.idCargaEntregaMotivoRetorno : null) !== null)" class="info-icon" right icon="check" color="orange" />
+          <q-item-side v-if="item.sync === 'false' && ((item.ocorrencia && item.ocorrencia.confirmaEntrega === 'Sim') || (item.ocorrencia && item.ocorrencia.idCargaEntregaMotivoRetorno))" class="info-icon" right icon="sync_disabled" color="orange" />
+          <q-item-side v-if="item.ocorrencia && item.ocorrencia.confirmaEntrega === 'Sim'" class="info-icon" right icon="check" color="green" />
+          <q-item-side v-if="item.ocorrencia && item.ocorrencia.idCargaEntregaMotivoRetorno" class="info-icon" right icon="check" color="orange" />
         </q-item>
       </q-list>
     </div>
@@ -24,9 +24,8 @@
 <style>
 .itens .info-icon {
   margin: 0 !important;
-}
-.itens .info-icon {
   min-width: 0 !important;
+  text-align: right;
 }
 </style>
 

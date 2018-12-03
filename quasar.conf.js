@@ -86,7 +86,8 @@ module.exports = function (ctx) {
         'QProgress',
         'QKnob',
         'QToggle',
-        'QModal'
+        'QModal',
+        'QPopover'
       ],
       directives: [
         'Ripple', 'GoBack'
