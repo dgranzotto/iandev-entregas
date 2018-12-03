@@ -3,15 +3,7 @@ import store from '../store'
 
 export default {
   getEntregas () {
-    const params = {
-      usr: store.state.session.userSession.usr,
-      pwd: store.state.session.userSession.pwdHash,
-      cor: true,
-      apelido: 'GESTAOENTREGA-server-side-entregas-app',
-      action: 'execAndGetObject',
-      scriptFunction: 'get-entregas'
-    }
-    return store.state.app.axios.get('bdoserver2.7/CntServlet', { params: params })
+    return store.state.app.axios.get('bdoserver2.7/CntServlet', { params: getParams('get-entregas') })
       .then(response => {
         if (response.headers['result'] === 'ok') {
           console.log(response)
@@ -29,7 +21,40 @@ export default {
         console.log(error)
       })
   },
+  saveOcorrencias(entregas) {
+    
+
+    return store.state.app.axios.post('bdoserver2.7/CntServlet', { params: getParams('save-ocorrencias') })
+      .then(response => {
+        if (response.headers['result'] === 'ok') {
+
+
+          console.log(response)
+          // store.commit('app/setEntregas', response.data)
+          // store.commit('app/persistEntregas')
+          // store.commit('app/persistMotivosRetorno')
+          // db.dumpDB()
+          store.commit('app/loadEntregas')
+          store.commit('app/loadMotivosRetorno')
+        } else {
+          store.commit('app/setEntregasLastAttempt', 'error', 'Erro ao tentar sincronizar')
+        }
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  })
   syncEntregas () {
     return store.dispatch('app/getEntregas')
+  },
+  getParams(scriptFunction) {
+    return {
+      usr: store.state.session.userSession.usr,
+      pwd: store.state.session.userSession.pwdHash,
+      cor: true,
+      apelido: 'GESTAOENTREGA-server-side-entregas-app',
+      action: 'execAndGetObject',
+      scriptFunction: scriptFunction
+    }
   }
 }
