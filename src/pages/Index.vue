@@ -17,7 +17,9 @@
             <div class="text-faded s-size">Realizadas</div>
           </q-card-title>
           <q-card-main>
-            <q-knob v-model="numRealizadas" :min="0" :max="numEntregas" color="positive" size="80px" line-width="3px" ><div class="s-size">{{ numRealizadas }}</div></q-knob>
+            <q-knob v-model="getNumRealizadas" :min="0" :max="$store.state.app.entregas.length" color="positive" size="80px" line-width="3px" >
+              <div class="s-size">{{ getNumRealizadas }}</div>
+            </q-knob>
           </q-card-main>
          </q-card>
         </div>
@@ -27,7 +29,9 @@
               <div class="text-faded s-size">Pendentes</div>
             </q-card-title>
             <q-card-main>
-              <q-knob v-model="numPendentes" :min="0" :max="numEntregas" color="negative" size="80px" line-width="3px" ><div class="s-size">{{ numPendentes }}</div></q-knob>
+              <q-knob v-model="getNumRetornos" :min="0" :max="$store.state.app.entregas.length" color="negative" size="80px" line-width="3px" >
+                <div class="s-size">{{ getNumRetornos }}</div>
+              </q-knob>
             </q-card-main>
           </q-card>
         </div>
@@ -41,28 +45,25 @@
 
 <script>
 import entregaServices from '../services/entrega-services'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PageIndex',
   data () {
     return {
-      numEntregas: 19,
-      numRealizadas: 12,
-      numPendentes: 7
     }
   },
   methods: {
     entregas () {
-      this.gotoPage('entregas')
-    },
-    gotoPage (page) {
-      this.$router.push({
-        name: page
-      })
+      this.$uiUtil.gotoPage(this, 'entregas')
     }
+  },
+  computed: {
+    ...mapGetters('app', [ 'getNumRealizadas', 'getNumRetornos' ])
   },
   created () {
     console.log('Index.vue created')
+    console.log('syncEntregas()')
     entregaServices.syncEntregas()
   }
 }

@@ -1,45 +1,77 @@
-import bo from '../bo/entrega-bo'
+import bo from '../../bo/entrega-bo'
 
 export const getRealizadas = (state) => {
-    let realizadas = []
-    let len = state.app.entregas.length
-    for (let i = 0; i < len; i++) {
-      if (bo.isRealizada(state.app.entregas[i])) {
-        realizadas.push(state.app.entregas[i])
-      }
+  let realizadas = []
+  let len = state.entregas.length
+  for (let i = 0; i < len; i++) {
+    if (bo.isRealizada(state.entregas[i])) {
+      realizadas.push(state.entregas[i])
     }
-    return realizadas
+  }
+  return realizadas
+}
+
+export const getNumRealizadas = (state, getters) => {
+  return getters.getRealizadas.length
 }
 
 export const getRetornos = (state) => {
-    let retornos = []
-    let len = state.app.entregas.length
-    for (let i = 0; i < len; i++) {
-      if (bo.isRetorno(state.app.entregas[i])) {
-        retornos.push(state.app.entregas[i])
-      }
+  let retornos = []
+  let len = state.entregas.length
+  for (let i = 0; i < len; i++) {
+    if (bo.isRetorno(state.entregas[i])) {
+      retornos.push(state.entregas[i])
     }
-    return retornos
+  }
+  return retornos
+}
+
+export const getNumRetornos = (state, getters) => {
+  return getters.getRetornos.length
 }
 
 export const getNaoPendentes = (state) => {
-    let naoPendentes = []
-    let len = state.app.entregas.length
-    for (let i = 0; i < len; i++) {
-      if (bo.isRealizada(state.app.entregas[i]) || bo.isConfirmada(state.app.entregas[i])) {
-        naoPendentes.push(state.app.entregas[i])
-      }
+  let naoPendentes = []
+  let len = state.entregas.length
+  for (let i = 0; i < len; i++) {
+    if (bo.isNaoPendente(state.entregas[i])) {
+      naoPendentes.push(state.entregas[i])
     }
-    return naoPendentes
+  }
+  return naoPendentes
+}
+
+export const getNumNaoPendentes = (state, getters) => {
+  return getters.getNaoPendentes.length
 }
 
 export const getPendentes = (state) => {
-    let pendentes = []
-    let len = state.app.entregas.length
-    for (let i = 0; i < len; i++) {
-      if (!bo.isRealizada(state.app.entregas[i]) && !bo.isConfirmada(state.app.entregas[i])) {
-        pendentes.push(state.app.entregas[i])
-      }
+  let pendentes = []
+  let len = state.entregas.length
+  for (let i = 0; i < len; i++) {
+    if (!bo.isPendente(state.entregas[i])) {
+      pendentes.push(state.entregas[i])
     }
-    return pendentes
+  }
+  return pendentes
+}
+
+export const getNumPendentes = (state, getters) => {
+  return getters.getPendentes.length
+}
+
+export const isRealizada = (state) => {
+  return (entrega) => bo.isRealizada(entrega)
+}
+
+export const isRetorno = (state) => {
+  return (entrega) => bo.isRetorno(entrega)
+}
+
+export const isNaoPendente = (state) => {
+  return (entrega) => bo.isNaoPendente(entrega)
+}
+
+export const isPendente = (state) => {
+  return (entrega) => bo.isPendente(entrega)
 }

@@ -12,9 +12,9 @@
             <q-item-tile label>{{ item.descricao }}</q-item-tile>
             <q-item-tile sublabel>{{ item.subdescricao }}</q-item-tile>
           </q-item-main>
-          <q-item-side v-if="item.sync === 'false' && ((item.ocorrencia && item.ocorrencia.confirmaEntrega === 'Sim') || (item.ocorrencia && item.ocorrencia.idCargaEntregaMotivoRetorno))" class="info-icon" right icon="sync_disabled" color="orange" />
-          <q-item-side v-if="item.ocorrencia && item.ocorrencia.confirmaEntrega === 'Sim'" class="info-icon" right icon="check" color="green" />
-          <q-item-side v-if="item.ocorrencia && item.ocorrencia.idCargaEntregaMotivoRetorno" class="info-icon" right icon="check" color="orange" />
+          <q-item-side v-if="item.sync === 'false' && isNaoPendente(item)" class="info-icon" right icon="sync_disabled" color="orange" />
+          <q-item-side v-if="isRealizada(item)" class="info-icon" right icon="check" color="green" />
+          <q-item-side v-if="isRetorno(item)" class="info-icon" right icon="check" color="orange" />
         </q-item>
       </q-list>
     </div>
@@ -31,6 +31,7 @@
 
 <script>
 // import db from '../db/db'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'PageEntregas',
@@ -43,6 +44,9 @@ export default {
       this.$store.commit('app/setEntregaAtual', entregaAtual)
       this.$uiUtil.gotoPage(this, 'entrega')
     }
+  },
+  computed: {
+    ...mapGetters('app', [ 'isRealizada', 'isRetorno', 'isNaoPendente' ])
   },
   mounted () {
     // db.createDB()
