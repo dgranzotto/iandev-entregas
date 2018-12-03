@@ -15,6 +15,7 @@
 </style>
 
 <script>
+import db from '../db/db'
 import entregaServices from '../services/entrega-services'
 
 export default {
@@ -36,6 +37,7 @@ export default {
         this.loading = false
         this.$uiUtil.gotoPage(this, 'home')
         this.$uiUtil.showSuccessMessage('Login realizado com sucesso')
+        db.initializeDB()
         entregaServices.syncEntregas()
       }).catch(error => {
         this.loading = false
