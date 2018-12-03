@@ -8,19 +8,19 @@ export default {
     })
   },
   showSuccessMessage (message) {
-    Notify.create({ message, type: 'positive', position: 'center', timeout: 800 })
+    Notify.create({ message, type: 'positive', position: 'top', timeout: 800 })
   },
   showErrorMessage (message, detail) {
     if (detail) {
       message = message + '<p>' + detail
     }
-    Notify.create({ message, type: 'negative', position: 'center' })
+    Notify.create({ message, type: 'negative', position: 'top' })
   },
   showWarningMessage (message) {
-    Notify.create({ message, type: 'warning', position: 'center' })
+    Notify.create({ message, type: 'warning', position: 'top' })
   },
   showInfoMessage (message) {
-    Notify.create({ message, type: 'info', position: 'center' })
+    Notify.create({ message, type: 'info', position: 'top' })
   },
   showConfirmErrorMessage (message, title) {
     return Dialog.create({ title: title, message: message, ok: 'OK' })
