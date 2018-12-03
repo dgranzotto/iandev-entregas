@@ -7,9 +7,6 @@
       <q-btn v-if="$store.state.app.entregaAtual.address || ($store.state.app.entregaAtual.latitudeentrega && $store.state.app.entregaAtual.longitudeentrega)" rounded color="primary" icon="directions" label="Visualizar Rota" size="md" class="full-width q-my-md" @click="visualizarRota" />
       <q-item-separator />
       <div class="row">
-        <div class="col-12" style="font-size:1.2em;">
-          <q-toggle @input="onChangeConfirmaEntrega" v-model="confirmaEntrega" checked-icon="check" unchecked-icon="close" left-label color="positive" label="Entrega realizada?" true-value="Sim" false-value="Não"/> {{ confirmaEntrega }}
-        </div>
         <div class="col-12 q-mt-sm q-mb-sm">
           <q-btn-group class="full-width" rounded>
             <q-btn @click="tirarFotoRecibo" rounded class="half-width" align="center" size="sm" color="indigo" label="Foto do Recibo" icon="photo_camera">
@@ -17,6 +14,9 @@
             </q-btn>
             <q-btn @click="adicionarObservacao" rounded class="half-width" align="center" size="sm" color="indigo" label="Observação" icon="add_comment"></q-btn>
           </q-btn-group>
+        </div>
+        <div class="col-12 q-mt-sm q-mb-md" style="font-size:1.2em;">
+          <q-toggle @input="onChangeConfirmaEntrega" v-model="confirmaEntrega" checked-icon="check" unchecked-icon="close" left-label color="positive" label="Entrega realizada?" true-value="Sim" false-value="Não"/> {{ confirmaEntrega }}
         </div>
       </div>
       <q-select @input="onChangeMotivoRetorno" float-label="Motivo do retorno" inverted-light :color="motivoRetornoColor" separator v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" />
@@ -158,6 +158,8 @@ export default {
           this.motivoRetornoColor = 'white'
           this.$store.state.app.entregaAtual.ocorrencia.confirmaEntrega = newVal
           this.$store.state.app.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
+          this.setMapLocalEntrega()
+          this.setDataHoraEntrega()
         } else {
           this.confirmaEntrega = 'Não'
           this.$store.state.app.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
@@ -170,6 +172,40 @@ export default {
       if (this.confirmaEntrega === 'Sim') {
         this.confirmaEntrega = 'Não'
         this.$store.state.app.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
+      }
+      this.setMapLocalEntrega()
+      this.setDataHoraEntrega()
+    },
+    setDataHoraEntrega () {
+      var date = new Date()
+      this.$store.state.app.entregaAtual.ocorrencia.data = this.$moment(date).format('YYYY-MM-DD')
+      this.$store.state.app.entregaAtual.ocorrencia.hora = this.$moment(date).format('HH:mm:ss')
+    },
+    setMapLocalEntrega () {
+      const vm = this
+      vm.$q.loading.show()
+
+      if (window.cordova) {
+        cordova.plugins.diagnostic.isLocationEnabled(function (enabled) {
+          if (!enabled) {
+            cordova.plugins.diagnostic.switchToLocationSettings()
+          }
+        }, function (error) {
+          console.log(error)
+        })
+      }
+
+      navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true, timeout: 120000 })
+
+      //  Callback functions
+      function onMapSuccess (position) {
+        vm.$store.state.app.entregaAtual.ocorrencia.latitudeConfirmacaoEntrega = position.coords.latitude
+        vm.$store.state.app.entregaAtual.ocorrencia.longitudeConfirmacaoEntrega = position.coords.longitude
+        vm.$q.loading.hide()
+      }
+      function onMapError (error) {
+        vm.$q.loading.hide()
+        console.log(error)
       }
     }
   },

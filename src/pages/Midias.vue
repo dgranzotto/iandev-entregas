@@ -121,6 +121,10 @@ export default {
     // entregaServices.syncEntregas()
     this.updateThumbnails()
     this.getWindowHeight()
+
+    if (this.$store.state.app.entregaAtual.itemAtual.midias.length === 0) {
+      this.tirarFoto()
+    }
   },
   mounted () {
     this.$nextTick(function () {
