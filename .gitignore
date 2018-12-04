@@ -5,6 +5,7 @@ node_modules
 /dist
 /src-cordova/node_modules
 /src-cordova/platforms
+/src-cordova/www/js
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
