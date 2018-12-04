@@ -114,6 +114,7 @@ export default {
           quality: 50,
           destinationType: Camera.DestinationType.FILE_URI,
           encodingType: Camera.EncodingType.JPEG,
+          allowEdit: true,
           correctOrientation: true
         }
       )

@@ -8,8 +8,8 @@ export default {
         if (response.headers['result'] === 'ok') {
           console.log(response)
           store.commit('app/setEntregas', response.data)
-          store.commit('app/persistEntregas')
-          store.commit('app/persistMotivosRetorno')
+          // store.commit('app/persistEntregas')
+          // store.commit('app/persistMotivosRetorno')
           // db.dumpDB()
           // store.commit('app/loadEntregas')
           // store.commit('app/loadMotivosRetorno')
