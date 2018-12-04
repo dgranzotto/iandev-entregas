@@ -16,6 +16,9 @@
     "cordova-plugin-geolocation": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
+    "cordova-plugin-network-information": {
+      "PACKAGE_NAME": "br.com.iandev.entregas"
+    },
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
@@ -23,9 +26,6 @@
       "PACKAGE_NAME": "br.com.iandev.entregas"
     },
     "cordova.plugins.diagnostic": {
-      "PACKAGE_NAME": "br.com.iandev.entregas"
-    },
-    "cordova-plugin-network-information": {
       "PACKAGE_NAME": "br.com.iandev.entregas"
     }
   },
