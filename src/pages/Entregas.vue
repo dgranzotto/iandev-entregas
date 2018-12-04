@@ -2,21 +2,27 @@
   <!--<q-page class="flex flex-center">-->
   <q-page padding class="row justify-center">
     <div style="width: 500px; max-width: 90vw;">
-    <!-- <q-btn :loading="loading" round icon="map" color="primary" @click="handler"> -->
-    <!-- <q-spinner-oval slot="loading" /> -->
-    <!-- </q-btn> -->
+      <div class="row">
+        <q-btn rounded color="primary" icon="sync" label="Sincronizar" size="md" class="q-my-md" @click="realizarEntrega" />
+        <div style="margin: 20px">
+          <span class="caption">Última atualização em<br></span>
+          <span>{{ $moment($store.state.entregasLastSync).format(`DD/MM/YYYY [às] HH:mm`) }}</span>
+        </div>
+      </div>
       <q-item-separator />
-      <q-list no-border striped class="q-mt-md dark-example">
-        <q-item class="itens" v-for="(item, index) in $store.state.app.entregas" :key="index" @click.native="realizarEntrega(item)">
-          <q-item-main>
-            <q-item-tile label>{{ item.descricao }}</q-item-tile>
-            <q-item-tile sublabel>{{ item.subdescricao }}</q-item-tile>
-          </q-item-main>
-          <q-item-side v-if="item.sync === 'false' && isNaoPendente(item)" class="info-icon" right icon="sync_disabled" color="orange" />
-          <q-item-side v-if="isRealizada(item)" class="info-icon" right icon="check" color="green" />
-          <q-item-side v-if="isRetorno(item)" class="info-icon" right icon="check" color="orange" />
-        </q-item>
-      </q-list>
+      <q-scroll-area style="height: 75vh; max-height: 75vh;">
+        <q-list no-border striped>
+          <q-item class="itens" v-for="(item, index) in $store.state.app.entregas" :key="index" @click.native="realizarEntrega(item)">
+            <q-item-main>
+              <q-item-tile label>{{ item.descricao }}</q-item-tile>
+              <q-item-tile sublabel>{{ item.subdescricao }}</q-item-tile>
+            </q-item-main>
+            <q-item-side v-if="item.sync === 'false' && isNaoPendente(item)" class="info-icon" right icon="sync_disabled" color="orange" />
+            <q-item-side v-if="isRealizada(item)" class="info-icon" right icon="check" color="green" />
+            <q-item-side v-if="isRetorno(item)" class="info-icon" right icon="check" color="orange" />
+          </q-item>
+        </q-list>
+      </q-scroll-area>
     </div>
   </q-page>
 </template>
@@ -37,6 +43,7 @@ export default {
   name: 'PageEntregas',
   data () {
     return {
+      number: 10
     }
   },
   methods: {

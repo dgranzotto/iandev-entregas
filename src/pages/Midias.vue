@@ -135,7 +135,20 @@ export default {
             })
         }, (error) => { // on fail
           console.log(error)
+<<<<<<< HEAD
         })
+=======
+          vm.$uiUtil.showErrorMessage('Não foi possível acessar a camera do dispositivo')
+        },
+        {
+          quality: 50,
+          destinationType: Camera.DestinationType.FILE_URI,
+          encodingType: Camera.EncodingType.JPEG,
+          allowEdit: true,
+          correctOrientation: true
+        }
+      )
+>>>>>>> 95b4356f5466c10e48f4338d64cc408c74d2aacc
     }
   },
   created () {
