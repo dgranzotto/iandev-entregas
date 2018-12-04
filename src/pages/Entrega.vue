@@ -11,8 +11,8 @@
       <div class="row">
         <div class="col-12 q-mt-sm q-mb-sm">
           <q-btn-group class="full-width" push>
-            <q-btn @click="tirarFotoRecibo" push align="center" size="md" :color="fotoReciboStatus.color" label="Foto do Recibo" icon="photo_camera"></q-btn>
-            <q-btn @click="adicionarObservacao" push align="center" size="md" color="primary" label="Observação" icon="insert_comment"></q-btn>
+            <q-btn @click="tirarFotoRecibo" push class="half-width" align="center" size="md" :color="fotoReciboStatus.color" label="Foto do Recibo" icon="photo_camera"></q-btn>
+            <q-btn @click="adicionarObservacao" push class="half-width" align="center" size="md" color="primary" label="Observação" icon="insert_comment"></q-btn>
           </q-btn-group>
         </div>
         <div class="col-12 q-mt-sm q-mb-md" style="font-size:1.2em;">
