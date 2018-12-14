@@ -1,4 +1,5 @@
 export default {
+  runningAsWebApp: false,
   consoleOutput: true,
   apiGraphQL: 'http://localhost:8000/graphql',
   backendUrl: '/backend',

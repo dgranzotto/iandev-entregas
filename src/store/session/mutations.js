@@ -1,10 +1,14 @@
 export const setUserSession = (state, payload) => {
   state.userSession = payload
   state.userSession.lastLogin = new Date()
+  let idx = payload.url.indexOf('://')
+  state.userSession.dbName = payload.usr + '@' + payload.url.substring(idx >= 0 ? idx + 3 : 0) + '.db'
+  state.userSession.dbName = state.userSession.dbName.replace(':', '-')
 }
 
-export const setUser = (state, payload) => {
-  state.user = payload
+export const setUserInfo = (state, payload) => {
+  state.userInfo = payload
+  state.userInfo.idsetup = 'userInfo'
 }
 
 export const setUserPrefs = (state, payload) => {
@@ -21,7 +25,7 @@ export const clear = (state) => {
     pwd: null,
     url: ''
   }
-  state.user = {
+  state.userInfo = {
     idusuario: null,
     usuario: '',
     idcolaborador: 0,

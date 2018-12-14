@@ -13,6 +13,7 @@ module.exports = function (ctx) {
       'local-storage',
       'moment',
       'boot',
+      'setup',
       'maps'
     ],
     css: [
@@ -85,6 +86,11 @@ module.exports = function (ctx) {
         'QCardSeparator',
         'QCardActions',
         'QProgress',
+        'QSpinner',
+        'QSpinnerBars',
+        'QSpinnerMat',
+        'QSpinnerPuff',
+        'QSpinnerRings',
         'QKnob',
         'QToggle',
         'QModal',

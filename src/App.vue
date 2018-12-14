@@ -5,8 +5,15 @@
 </template>
 
 <script>
+import network from './util/network'
+import store from './store'
+
 export default {
-  name: 'App'
+  name: 'App',
+  created () {
+    console.log('App created')
+    store.commit('app/setOnline', network.isOnline())
+  }
 }
 </script>
 

@@ -1,13 +1,8 @@
-import config from '../config'
 import { _LocalStorage } from '../boot/local-storage'
 import store from '../store'
 
 export default () => {
-  let session = _LocalStorage.get(config.session.tokenName)
-  if (session) {
-    store.commit('session/setAccessToken', session)
-  } else {
-    store.commit('session/setAccessToken', null)
-  }
+  let userSession = Object.assign(store.state.session.userSession, _LocalStorage.get('userSession'))
+  store.commit('session/setUserSession', userSession)
   return Promise.resolve(true)
 }

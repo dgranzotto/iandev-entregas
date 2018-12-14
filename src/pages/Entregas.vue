@@ -3,10 +3,12 @@
   <q-page padding class="row justify-center">
     <div style="width: 500px; max-width: 90vw;">
       <div class="row">
-        <q-btn rounded color="primary" icon="sync" label="Sincronizar" size="md" class="q-my-md" @click="realizarEntrega" />
-        <div style="margin: 20px">
-          <span class="caption">Última atualização em<br></span>
-          <span>{{ $moment($store.state.entregasLastSync).format(`DD/MM/YYYY [às] HH:mm`) }}</span>
+        <div class="auto">
+          <q-btn rounded color="primary" icon="sync" label="Sincronizar" size="md" class="q-my-md" @click="salvarOcorrencias" />
+        </div>
+        <div class="auto" style="margin-top: 14px; margin-left: 10px;">
+          <small>Última atualização em<br></small>
+          <small><strong>{{ $moment($store.state.app.entregasInfo.entregasLastSync).format(`DD/MM/YYYY [às] HH:mm`) }}</strong></small>
         </div>
       </div>
       <q-item-separator />
@@ -17,6 +19,7 @@
               <q-item-tile label>{{ item.descricao }}</q-item-tile>
               <q-item-tile sublabel>{{ item.subdescricao }}</q-item-tile>
             </q-item-main>
+            <q-item-side v-if="item.sync === 'true' && isNaoPendente(item)" class="info-icon" right icon="sync" color="green" />
             <q-item-side v-if="item.sync === 'false' && isNaoPendente(item)" class="info-icon" right icon="sync_disabled" color="orange" />
             <q-item-side v-if="isRealizada(item)" class="info-icon" right icon="check" color="green" />
             <q-item-side v-if="isRetorno(item)" class="info-icon" right icon="check" color="orange" />
@@ -36,7 +39,8 @@
 </style>
 
 <script>
-// import db from '../db/db'
+import bo from '../bo/entrega-bo'
+import entregaServices from '../services/entrega-services'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -47,6 +51,17 @@ export default {
     }
   },
   methods: {
+    salvarOcorrencias () {
+      entregaServices.saveOcorrenciasStart((count) => {
+        if (count > 0) {
+          this.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
+        } else if (count < 0) {
+          this.$uiUtil.showErrorMessage(bo.getDescEnvioOcorrenciasServer(count))
+        }
+      }, (err) => {
+        this.$uiUtil.showErrorMessage('Error ao enviar ocorrências ao servidor', err)
+      })
+    },
     realizarEntrega (entregaAtual) {
       this.$store.commit('app/setEntregaAtual', entregaAtual)
       this.$uiUtil.gotoPage(this, 'entrega')
@@ -54,31 +69,6 @@ export default {
   },
   computed: {
     ...mapGetters('app', [ 'isRealizada', 'isRetorno', 'isNaoPendente' ])
-  },
-  mounted () {
-    // db.createDB()
-    // db.transaction((tx) => {
-    //   db.entregaExists({ idcargaentrega: 111, idsaidaorigem: 12 }, tx, (exists) => {
-    //     console.log('--entregaExists 1/12: ' + exists)
-    //   }, (error) => {
-    //     console.log('--entregaExists error:' + JSON.stringify(error))
-    //   })
-    //   db.entregaExists({ idcargaentrega: 1111111, idsaidaorigem: 12 }, tx, (exists) => {
-    //     console.log('--entregaExists 1111111/12: ' + exists)
-    //   }, (error) => {
-    //     console.log('--entregaExists error:' + JSON.stringify(error))
-    //   })
-    //   db.getEntregas(tx, (entregas) => {
-    //     console.log('--getEntregas: ')
-    //     console.log(entregas)
-    //   }, (error) => {
-    //     console.log('--getEntregas error:' + JSON.stringify(error))
-    //   })
-    // }, (error) => {
-    //   console.log('--Transaction ERROR: ' + error.message)
-    // }, () => {
-    //   console.log('--Transaction OK')
-    // })
   }
 }
 </script>

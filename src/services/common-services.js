@@ -7,8 +7,8 @@ export const setUserSession = (payload) => {
   return Promise.resolve(payload)
 }
 
-export const setUser = (payload) => {
-  store.commit('session/setUser', payload)
-  _LocalStorage.set('user', payload)
+export const setUserInfo = (payload) => {
+  store.commit('session/setUserInfo', payload)
+  // _LocalStorage.set('userInfo', payload)
   return Promise.resolve(payload)
 }

@@ -20,8 +20,6 @@
         </div>
       </div>
       <q-select @input="onChangeMotivoRetorno" float-label="Motivo do retorno" inverted-light :color="motivoRetornoColor" separator v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" />
-      <!-- <q-select float-label="Selecione o tipo da ocorrência" v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" /> -->
-      <q-item-separator />
       <q-list no-border striped class="q-mt-md dark-example">
         <div class="q-headline">Itens</div>
         <q-item v-for="(item, index) in entregaAtual.itens" :key="index" @click.native="entregas(item)">
@@ -48,6 +46,9 @@
 </template>
 
 <script>
+import bo from '../bo/entrega-bo'
+import dao from '../db/dao'
+import entregaServices from '../services/entrega-services'
 import { mapState } from 'vuex'
 
 export default {
@@ -71,7 +72,30 @@ export default {
     })
   },
   methods: {
-    entregas () {
+    beforeLeave (to) {
+      if (to.name === 'entregas') {
+        if (this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno) { // Retorno
+          if (!this.entregaAtual.ocorrencia.observacao || this.entregaAtual.ocorrencia.observacao.trim().length === 0) {
+            this.$uiUtil.showErrorMessage('É necessário digitar uma observação sobre o retorno')
+            return false
+          }
+        }
+        dao.saveEntrega(this.entregaAtual)
+          .then(result => {
+            // this.$uiUtil.showSuccessMessage('Entrega gravada com sucesso')
+          })
+          .catch(error => {
+            this.$uiUtil.showErrorMessage('Erro ao gravar entrega', error.message)
+          })
+          .finally(() => { // Gravando ou não a ocorrência no SQLite, tenta enviar a mesma ao servidor
+            entregaServices.saveOcorrenciasStart((count) => {
+              if (count > 0) {
+                this.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
+              }
+            })
+          })
+      }
+      return true
     },
     onModalShowObservacao () {
       this.$refs.observacao.focus()
@@ -98,6 +122,10 @@ export default {
       }
 
       function takePhoto () {
+        if (vm.$config.runningAsWebApp) {
+          vm.assignImagemRecibo('xyz')
+          return
+        }
         setTimeout(
           navigator.camera.getPicture(
             (data) => { // on success
@@ -128,9 +156,7 @@ export default {
                   var newFileName = yyyy + '-' + mm + '-' + dd + 'R_' + fileName
                   fileEntry.moveTo(dirEntry, newFileName,
                     entry => { // on success
-                      this.entregaAtual.ocorrencia.imagemReciboPath = entry.nativeURL
-                      this.fotoReciboStatus.icon = 'check'
-                      this.fotoReciboStatus.color = 'positive'
+                      this.assignImagemRecibo(entry.nativeURL)
                     }, (error) => { // on fail
                       console.log(error)
                     })
@@ -144,6 +170,11 @@ export default {
           console.log(error)
         })
     },
+    assignImagemRecibo (imagemReciboPath) {
+      this.entregaAtual.ocorrencia.imagemReciboPath = imagemReciboPath
+      this.fotoReciboStatus.icon = 'check'
+      this.fotoReciboStatus.color = 'positive'
+    },
     tirarFoto (item) {
       this.$store.commit('app/setItemAtual', item)
       this.$uiUtil.gotoPage(this, 'midias')
@@ -154,13 +185,13 @@ export default {
     onChangeConfirmaEntrega (newVal) {
       if (newVal === 'Sim') {
         // valida se existe algum item que é obrigatorio tirar foto e se foi tirado a foto desse item
-        var validaConfirmacao = true
+        let validaConfirmacao = true
 
         if (!this.entregaAtual.ocorrencia.imagemReciboPath) {
           validaConfirmacao = false
           this.$uiUtil.showErrorMessage('Obrigatório tirar foto do recibo')
         } else {
-          for (var i = 0; i < this.entregaAtual.itens.length; i++) {
+          for (let i = 0; i < this.entregaAtual.itens.length; i++) {
             if (this.entregaAtual.itens[i].requerfoto === 'S') {
               if (!this.entregaAtual.itens[i].midias) {
                 validaConfirmacao = false
@@ -197,6 +228,7 @@ export default {
       }
       this.setMapLocalEntrega()
       this.setDataHoraEntrega()
+      this.adicionarObservacao()
     },
     setDataHoraEntrega () {
       var date = new Date()

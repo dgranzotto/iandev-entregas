@@ -10,8 +10,9 @@
           <q-icon name="arrow_back" />
         </q-btn>
         <q-toolbar-title>
-          {{title}}
+          {{ $route.meta.title || 'IANDev Entregas'}}
         </q-toolbar-title>
+        <q-icon :name="env.networkIcon" />
       </q-toolbar>
     </q-layout-header>
 
@@ -22,21 +23,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 
 export default {
   name: 'BackLayout',
   data () {
     return {
-      title: 'Sobre'
     }
   },
-  methods: {
-    gotoPage (page) {
-      this.leftDrawerOpen = false
-      this.$router.push({
-        name: page
-      })
-    }
+  computed: {
+    ...mapState({
+      env: state => state.app.env
+    })
   }
 }
 </script>

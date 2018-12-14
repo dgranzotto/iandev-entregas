@@ -1,14 +1,16 @@
-import db from '../../db/db'
+import network from '../../util/network'
 import { Quasar, LocalStorage } from 'quasar'
 import { i18n } from '../../plugins/i18n'
 
 export const setEntregas = (state, payload) => {
   state.motivosRetorno = payload.motivosretorno
   state.entregas = payload.entregas
-  state.entregasLastSync = new Date()
-  state.entregasLastSyncAttempt = state.entregasLastSync
-  state.entregasLastSyncAttemptStatus = 'ok'
-  state.entregasLastSyncAttemptMessage = 'Sincronização realizada com sucesso'
+  if (!payload.local) {
+    state.entregasInfo.entregasLastSync = new Date()
+    state.entregasInfo.entregasLastSyncAttempt = state.entregasLastSync
+    state.entregasInfo.entregasLastSyncAttemptStatus = 'ok'
+    state.entregasInfo.entregasLastSyncAttemptMessage = 'Sincronização realizada com sucesso'
+  }
 }
 
 export const setEntregasLastAttempt = (state, status, message) => {
@@ -21,7 +23,7 @@ export const setEntregaAtual = (state, payload) => {
   payload.itemAtual = { midias: [] }
   if (!payload.ocorrencia) {
     payload.ocorrencia = {}
-    for (var obj in state.entregaAtual.ocorrencia) {
+    for (let obj in state.entregaAtual.ocorrencia) {
       payload.ocorrencia[obj] = null
     }
   }
@@ -33,60 +35,12 @@ export const setItemAtual = (state, payload) => {
   state.entregaAtual.itemAtual = payload
 }
 
-export const persistEntregas = (state) => {
-  console.log('Persisting Entregas...')
-  db.transaction((tx) => {
-    db.saveEntregas(state.entregas, tx)
-    console.log('Entregas persisted')
-  }, (error) => {
-    console.log(error)
-  }, () => {
-    console.log('Transaction End')
-  })
+export const setEntregasInfo = (state, payload) => {
+  state.entregasInfo = payload
 }
 
-export const loadEntregas = (state) => {
-  console.log('Loading Entregas...')
-  db.transaction((tx) => {
-    db.getEntregas(tx, (entregas) => {
-      state.entregas = entregas
-      console.log(`${entregas.length} rows loaded`)
-    }, (error) => {
-      console.log(error)
-    })
-  }, (error) => {
-    console.log(error)
-  }, () => {
-    console.log('Transaction End')
-  })
-}
-
-export const persistMotivosRetorno = (state) => {
-  console.log('Persisting Motivos de Retorno...')
-  db.transaction((tx) => {
-    db.saveMotivosRetorno(state.motivosRetorno, tx)
-    console.log('Motivos de Retorno persisted')
-  }, (error) => {
-    console.log(error)
-  }, () => {
-    console.log('Transaction End')
-  })
-}
-
-export const loadMotivosRetorno = (state) => {
-  console.log('Loading Motivos de Retorno...')
-  db.transaction((tx) => {
-    db.getMotivosRetorno(tx, (motivosRetorno) => {
-      state.motivosRetorno = motivosRetorno
-      console.log(`${motivosRetorno.length} rows loaded`)
-    }, (error) => {
-      console.log(error)
-    })
-  }, (error) => {
-    console.log(error)
-  }, () => {
-    console.log('Transaction End')
-  })
+export const setMotivosRetorno = (state, payload) => {
+  state.motivosRetorno = payload
 }
 
 export const setLanguage = (state, payload) => {
@@ -102,4 +56,14 @@ export const setLanguage = (state, payload) => {
 
 export const setup = (state, payload) => {
   state.setup = payload
+}
+
+export const setOnline = (state, online) => {
+  state.env.online = online
+  state.env.networkState = network.getNetworkState()
+  state.env.networkIcon = network.getConnectionIcon()
+}
+
+export const setSyncing = (state, syncing) => {
+  state.env.syncing = syncing
 }

@@ -6,41 +6,38 @@
         :glossy="$q.theme === 'mat'"
         :inverted="$q.theme === 'ios'"
       >
-        <q-btn
-          flat
-          dense
-          round
-          @click="leftDrawerOpen = !leftDrawerOpen"
-          aria-label="Menu"
-        >
+        <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen" aria-label="Menu">
           <q-icon name="menu" />
         </q-btn>
 
         <q-toolbar-title>
-          IANDev Entregas
+          {{ $route.meta.title || 'IANDev Entregas'}}
         </q-toolbar-title>
+        <q-spinner-rings style="margin-right: 5px;" v-show="env.syncing" color="write" :size="30" />
+        <q-icon :name="env.networkIcon" />
       </q-toolbar>
     </q-layout-header>
-
     <q-layout-drawer
       v-model="leftDrawerOpen"
       :content-class="$q.theme === 'mat' ? 'bg-grey-2' : null"
     >
       <q-list no-border inset-delimiter>
         <q-list-header>Menu</q-list-header>
+        <div v-show="this.$router.currentRoute.name != 'login'">
+          <q-item-separator />
+          <q-item sparse>
+            <q-item-main>
+              <q-item-tile color="primary" label>{{ $store.state.session.userInfo.colaborador }}</q-item-tile>
+            </q-item-main>
+          </q-item>
+          <q-collapsible dense :sublabel="$store.state.session.userSession.url">
+            <div>
+              <q-btn flat color="secondary" label="Logoff" @click="logoff"/>
+            </div>
+          </q-collapsible>
+        </div>
         <q-item-separator />
-        <q-item sparse>
-          <q-item-main>
-            <q-item-tile color="primary" label>{{ $store.state.session.user.colaborador }}</q-item-tile>
-          </q-item-main>
-        </q-item>
-        <q-collapsible dense :sublabel="$store.state.session.userSession.url">
-          <div>
-            <q-btn flat color="secondary" label="Logoff" />
-          </div>
-        </q-collapsible>
-        <q-item-separator />
-        <q-item v-if="$store.state.session.user.idusuario != null" @click.native="gotoPage('home')">
+        <q-item v-if="$store.state.session.userInfo.idusuario != null" @click.native="gotoPage('home')">
           <q-item-side icon="home" />
           <q-item-main label="Início" />
         </q-item>
@@ -63,19 +60,23 @@
 
 <script>
 import { openURL } from 'quasar'
+import { mapState } from 'vuex'
 
 export default {
   name: 'MainLayout',
   data () {
     return {
       user: null,
-      leftDrawerOpen: this.$q.platform.is.desktop
+      leftDrawerOpen: false // this.$q.platform.is.desktop
     }
   },
   methods: {
     openURL,
     login (data) {
       this.user = data.user
+    },
+    logoff () {
+      this.$uiUtil.gotoPage(this, 'login')
     },
     gotoPage (page) {
       this.leftDrawerOpen = false
@@ -88,10 +89,16 @@ export default {
       navigator.app.exitApp()
     }
   },
+  computed: {
+    ...mapState({
+      env: state => state.app.env
+    })
+  },
   mounted () {
     this.$on('App.login', (data) => {
       this.login(data)
     })
+    console.log(this.env)
   }
 }
 </script>

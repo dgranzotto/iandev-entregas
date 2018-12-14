@@ -1,63 +1,51 @@
 import bo from '../../bo/entrega-bo'
 
 export const getRealizadas = (state) => {
-  let realizadas = []
-  let len = state.entregas.length
-  for (let i = 0; i < len; i++) {
-    if (bo.isRealizada(state.entregas[i])) {
-      realizadas.push(state.entregas[i])
-    }
+  return () => {
+    return bo.getRealizadas(state.entregas)
   }
-  return realizadas
 }
 
 export const getNumRealizadas = (state, getters) => {
-  return getters.getRealizadas.length
+  return () => {
+    return getters.getRealizadas().length
+  }
 }
 
 export const getRetornos = (state) => {
-  let retornos = []
-  let len = state.entregas.length
-  for (let i = 0; i < len; i++) {
-    if (bo.isRetorno(state.entregas[i])) {
-      retornos.push(state.entregas[i])
-    }
+  return () => {
+    return bo.getRetornos(state.entregas)
   }
-  return retornos
 }
 
 export const getNumRetornos = (state, getters) => {
-  return getters.getRetornos.length
+  return () => {
+    return getters.getRetornos().length
+  }
 }
 
 export const getNaoPendentes = (state) => {
-  let naoPendentes = []
-  let len = state.entregas.length
-  for (let i = 0; i < len; i++) {
-    if (bo.isNaoPendente(state.entregas[i])) {
-      naoPendentes.push(state.entregas[i])
-    }
+  return () => {
+    return bo.getNaoPendentes(state.entregas)
   }
-  return naoPendentes
 }
 
 export const getNumNaoPendentes = (state, getters) => {
-  return getters.getNaoPendentes.length
+  return () => {
+    return getters.getNaoPendentes().length
+  }
 }
 
 export const getPendentes = (state) => {
-  let pendentes = []
-  let len = state.entregas.length
-  for (let i = 0; i < len; i++) {
-    if (!bo.isPendente(state.entregas[i])) {
-      pendentes.push(state.entregas[i])
-    }
+  return () => {
+    return bo.getPendentes(state.entregas)
   }
-  return pendentes
 }
 
 export const getNumPendentes = (state, getters) => {
-  return getters.getPendentes.length
+  return () => {
+    return getters.getPendentes().length
+  }
 }
 
 export const isRealizada = (state) => {
@@ -74,4 +62,8 @@ export const isNaoPendente = (state) => {
 
 export const isPendente = (state) => {
   return (entrega) => bo.isPendente(entrega)
+}
+
+export const isEntregasOutOfDate = (state) => {
+  return () => bo.isEntregasOutOfDate(state.entregasInfo)
 }

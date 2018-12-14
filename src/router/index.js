@@ -25,8 +25,17 @@ export default function (/* { store, ssrContext } */) {
     // console.log(to)
     // console.log(from)
     // console.log(next)
-    uiUtil.loading()
-    next()
+    if (from.matched.length > 1 && from.matched[1].instances.default.beforeLeave) { // chama o método beforeLeave() quando o mesmo existir
+      if (from.matched[1].instances.default.beforeLeave(to)) {
+        uiUtil.loading()
+        next()
+      } else {
+        next(false)
+      }
+    } else {
+      uiUtil.loading()
+      next()
+    }
   })
 
   Router.afterEach((to, from, next) => {
