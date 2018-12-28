@@ -14,6 +14,7 @@ module.exports = function (ctx) {
       'moment',
       'boot',
       'setup',
+      'timer',
       'maps'
     ],
     css: [
@@ -94,7 +95,8 @@ module.exports = function (ctx) {
         'QKnob',
         'QToggle',
         'QModal',
-        'QPopover'
+        'QPopover',
+        'QAlert'
       ],
       directives: [
         'Ripple', 'GoBack'

@@ -50,33 +50,52 @@ export default {
     count = count || 0
     if (!bo.isSync(entregas[idx])) { // não sincronizada
       console.log(`Sending ocorrencia (${idx})`, entregas[idx].ocorrencia)
+      if (count === 0) {
+        store.commit('app/setSyncing', true)
+      }
       this.saveOcorrencia(entregas[idx], (entrega) => {
-        count++
-        if (idx + 1 < entregas.length) {
-          this.saveOcorrencias(entregas, success, error, idx + 1, count) // vai para a próxima ocorrência
-        } else {
-          success(count) // última ocorrência, finaliza o processo
-        }
+        dao.saveEntrega(entrega)
+          .then(result => {
+            console.log('Ocorrência gravada após sincronização')
+          })
+          .catch(error => {
+            console.log('Erro ao gravar ocorrência após sincronização')
+            console.log(error)
+          })
+          .finally(() => {
+            count++
+            if (idx + 1 < entregas.length) {
+              this.saveOcorrencias(entregas, success, error, idx + 1, count) // vai para a próxima ocorrência
+            } else {
+              store.commit('app/setSyncing', false)
+              success(count) // última ocorrência, finaliza o processo
+            }
+          })
       }, (err) => {
+        store.commit('app/setSyncing', false)
         error && error(err)
       })
     } else { // já sincronizada
       if (idx + 1 < entregas.length) {
         this.saveOcorrencias(entregas, success, error, idx + 1, count) // vai para a próxima ocorrência
       } else {
+        store.commit('app/setSyncing', false)
         success(count) // última ocorrência, finaliza o processo
       }
     }
   },
   saveOcorrencia (entrega, success, error) {
-    store.commit('app/setSyncing', true)
+    let setSyncing = !store.state.app.env.syncing
+    if (setSyncing) {
+      store.commit('app/setSyncing', true)
+    }
     let ocorrencia = Object.assign(entrega.ocorrencia, bo.getIdEntrega(entrega))
     console.log('Sending ocorrencia', ocorrencia)
     return store.state.app.axios.post('bdoserver2.7/CntServlet', 'ocorrencia=' + JSON.stringify(ocorrencia), { params: this.getParams('save-ocorrencia') })
       .then(response => {
         if (response.headers['result'] === 'ok') {
-          console.log(response)
-          console.log(entrega)
+          // console.log(response)
+          // console.log(entrega)
           entrega.ocorrencia.idcargaentregaocorrencia = response.data.entity.idcargaentregaocorrencia
           this.saveMidiasStart(entrega, (count) => {
             if (count >= 0) {
@@ -100,7 +119,9 @@ export default {
         error && error(err)
       })
       .finally(() => {
-        store.commit('app/setSyncing', false)
+        if (setSyncing) {
+          store.commit('app/setSyncing', false)
+        }
       })
   },
   saveMidiasStart (entrega, success, error) {
@@ -135,9 +156,9 @@ export default {
         return store.state.app.axios.post('bdoserver2.7/CntServlet', 'midia=' + JSON.stringify(midia), { params: this.getParams('save-midia') })
           .then(response => {
             if (response.headers['result'] === 'ok') {
-              console.log(response)
+              // console.log(response)
               midia.idCargaEntregaOcorrencia = response.idcargaentregaocorrencia
-              console.log(midia)
+              // console.log(midia)
               success && success(midia)
             } else {
               error && error(response.headers['result'])

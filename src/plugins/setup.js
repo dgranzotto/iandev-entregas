@@ -6,7 +6,7 @@ import uiUtil from '../ui-util'
 export default ({ Vue }) => {
   document.addEventListener('offline', onOffline, false)
   document.addEventListener('online', onOnline, false)
-  uiUtil.showInfoMessage('offline, online events')
+  // uiUtil.showInfoMessage('offline, online events')
   let networkState = navigator.connection.type
   console.log(networkState)
 }

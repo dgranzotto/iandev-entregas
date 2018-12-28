@@ -6,6 +6,10 @@ export const getRealizadas = (state) => {
   }
 }
 
+export const getRealizadasAsProp = (state) => {
+  return bo.getRealizadas(state.entregas)
+}
+
 export const getNumRealizadas = (state, getters) => {
   return () => {
     return getters.getRealizadas().length
@@ -16,6 +20,10 @@ export const getRetornos = (state) => {
   return () => {
     return bo.getRetornos(state.entregas)
   }
+}
+
+export const getRetornosAsProp = (state) => {
+  return bo.getRetornos(state.entregas)
 }
 
 export const getNumRetornos = (state, getters) => {
@@ -30,6 +38,10 @@ export const getNaoPendentes = (state) => {
   }
 }
 
+export const getNaoPendentesAsProp = (state) => {
+  return bo.getNaoPendentes(state.entregas)
+}
+
 export const getNumNaoPendentes = (state, getters) => {
   return () => {
     return getters.getNaoPendentes().length
@@ -40,6 +52,10 @@ export const getPendentes = (state) => {
   return () => {
     return bo.getPendentes(state.entregas)
   }
+}
+
+export const getPendentesAsProp = (state) => {
+  return bo.getPendentes(state.entregas)
 }
 
 export const getNumPendentes = (state, getters) => {

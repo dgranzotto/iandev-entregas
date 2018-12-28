@@ -2,10 +2,19 @@
 import { Notify, Dialog, Loading } from 'quasar'
 
 export default {
-  gotoPage (vue, page) {
-    vue.$router.push({
-      name: page
-    })
+  gotoPage (vue, page, onComplete, onAbort) {
+    if (typeof page === 'string') {
+      vue.$router.push({ name: page }, onComplete, onAbort)
+    } else {
+      vue.$router.push(page, onComplete, onAbort)
+    }
+  },
+  replacePage (vue, page, onComplete, onAbort) {
+    if (typeof page === 'string') {
+      vue.$router.replace({ name: page }, onComplete, onAbort)
+    } else {
+      vue.$router.replace(page, onComplete, onAbort)
+    }
   },
   showSuccessMessage (message) {
     Notify.create({ message, type: 'positive', position: 'top', timeout: 800 })

@@ -16,6 +16,11 @@ export default {
       idusuario: 0,
       usuario: '',
       nomeusuario: ''
+    },
+    config: {
+      sendinterval: 600000,
+      receiveinterval: 3600000,
+      networkcheckinterval: 180000
     }
   },
   userPrefs: {

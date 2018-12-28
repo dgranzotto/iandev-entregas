@@ -58,6 +58,8 @@ export default {
                   .finally(() => {
                     console.log(bo.getDateDescription(vm.$store.state.app.entregasInfo))
                     if (bo.isEntregasOutOfDate(vm.$store.state.app.entregasInfo)) { // base de dados local desatualizada
+                      console.log('-----')
+                      console.log(vm.$store.state.app.entregas)
                       entregaServices.saveOcorrenciasStart((count) => {
                         if (count > 0) {
                           vm.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))

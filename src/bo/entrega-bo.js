@@ -2,7 +2,8 @@ import file from '../util/file'
 import moment from 'moment-timezone'
 
 // const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 2 // 2 dias
-const ENTREGAS_OUT_OF_DATE = 1000 * 60 // 1 minuto
+const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 1 // 1 dia
+// const ENTREGAS_OUT_OF_DATE = 1000 * 60 // 1 minuto
 
 export default {
   isSync (entrega) {
@@ -29,6 +30,9 @@ export default {
       return duration.as('hours')
     }
     return 'Não há entregas gravadas no dispositivo'
+  },
+  isToday (date) {
+    return moment(date).format('YYYY-MM-DD') === moment(new Date()).format('YYYY-MM-DD')
   },
   getDateDescription (entregasInfo) {
     if (entregasInfo && entregasInfo.entregasLastSync) {

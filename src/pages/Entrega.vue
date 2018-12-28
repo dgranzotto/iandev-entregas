@@ -4,32 +4,53 @@
     <div style="width: 500px; max-width: 90vw;">
       <div class="q-headline">Entrega</div>
       <q-field :label="entregaAtual.descricao"></q-field>
-      <q-field :label="entregaAtual.subdescricao"></q-field>
+      <q-field :label="entregaAtual.endereco"></q-field>
       <q-btn v-if="entregaAtual.address || (entregaAtual.latitudeentrega && entregaAtual.longitudeentrega)" rounded push glossy color="primary" icon="directions" label="Visualizar Rota" size="md" class="full-width" @click="visualizarRota" />
       <q-item-separator />
       <q-field label="Confirmação da Entrega/Retorno"></q-field>
       <div class="row">
         <div class="col-12 q-mt-sm q-mb-sm">
           <q-btn-group class="full-width" push>
-            <q-btn @click="tirarFotoRecibo" push class="half-width" align="center" size="md" :color="fotoReciboStatus.color" label="Foto do Recibo" icon="photo_camera"></q-btn>
+            <q-btn @click="tirarFotoRecibo" push class="half-width" align="center" size="md" :color="fotoReciboStatus.color" label="Recibo" icon="photo_camera"></q-btn>
             <q-btn @click="adicionarObservacao" push class="half-width" align="center" size="md" color="primary" label="Observação" icon="insert_comment"></q-btn>
           </q-btn-group>
         </div>
-        <div class="col-12 q-mt-sm q-mb-md" style="font-size:1.2em;">
-          <q-toggle @input="onChangeConfirmaEntrega" v-model="confirmaEntrega" checked-icon="check" unchecked-icon="close" left-label color="positive" label="Entrega realizada?" true-value="Sim" false-value="Não"/> {{ confirmaEntrega }}
+        <div class="row">
+          <div class="col">
+            <q-btn @click="confirmarEntrega"
+              :disabled="confirmaEntrega === 'Sim'"
+              :glossy="confirmaEntrega !== 'Sim'"
+              :color="(confirmaEntrega === 'Sim' ? 'positive' : 'primary')"
+              :label="msgEntregaConfirmada"
+              rounded
+              size="lg"
+            />
+          </div>
+          <div style="col">
+            <q-btn @click="desfazerConfirmacaoEntrega" v-show="confirmaEntrega === 'Sim'" round flat style="color: gray;" icon="undo" />
+          </div>
         </div>
+        <!--<div class="col-12 q-mt-sm q-mb-md" style="font-size:1.2em;">
+          <q-toggle @input="onChangeConfirmaEntrega" v-model="confirmaEntrega" checked-icon="check" unchecked-icon="close" left-label color="positive" label="Entrega realizada?" true-value="Sim" false-value="Não"/> {{ confirmaEntrega }}
+        </div>-->
       </div>
-      <q-select @input="onChangeMotivoRetorno" float-label="Motivo do retorno" inverted-light :color="motivoRetornoColor" separator v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" />
+      <q-item-separator />
+      <div class="row">
+        <div class="col-11"><q-select @input="onChangeMotivoRetorno" float-label="Motivo do retorno" inverted-light :color="motivoRetornoColor" separator v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" /></div>
+        <div class="col-1"><q-btn @click="desfazerRetorno" v-show="motivoRetorno !== null" round flat style="color: gray;" icon="undo" /></div>
+      </div>
       <q-list no-border striped class="q-mt-md dark-example">
         <div class="q-headline">Itens</div>
-        <q-item v-for="(item, index) in entregaAtual.itens" :key="index" @click.native="entregas(item)">
+        <q-item v-for="(item, index) in entregaAtual.itens" :key="index">
           <q-item-main>
             <q-item-tile label>{{ item.descricao }}</q-item-tile>
             <q-item-tile sublabel>Quantidade: {{ item.quantidade }}</q-item-tile>
             <q-item-tile v-show="item.requerfoto == 'S' && (!item.midias || item.midias.length == 0)" label color="negative">Necessário tirar foto</q-item-tile>
           </q-item-main>
           <q-item-side>
-            <q-btn round color="primary" icon="photo_camera" @click.native="tirarFoto(item)"/>
+            <q-btn round color="primary" icon="photo_camera" @click.native="tirarFoto(item)">
+              <q-chip v-show="item.midias && item.midias.length > 0" floating color="positive">{{ item.midias && item.midias.length }}</q-chip>
+            </q-btn>
           </q-item-side>
         </q-item>
       </q-list>
@@ -63,37 +84,49 @@ export default {
       fotoReciboStatus: {
         icon: 'close',
         color: 'red-4'
-      }
+      },
+      sourcePage: ''
     }
   },
   computed: {
     ...mapState({
       entregaAtual: state => state.app.entregaAtual
-    })
+    }),
+    msgEntregaConfirmada () {
+      if (this.confirmaEntrega === 'Sim') {
+        return 'Entrega Confirmada dia ' +
+          this.entregaAtual.ocorrencia.data.substring(8) +
+          ' às ' +
+          this.entregaAtual.ocorrencia.hora
+      }
+      return 'Confirmar Entrega'
+    }
   },
   methods: {
     beforeLeave (to) {
-      if (to.name === 'entregas') {
-        if (this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno) { // Retorno
+      if (to.name.startsWith('entregas')) {
+        if (bo.isRetorno(this.entregaAtual)) { // Retorno
           if (!this.entregaAtual.ocorrencia.observacao || this.entregaAtual.ocorrencia.observacao.trim().length === 0) {
             this.$uiUtil.showErrorMessage('É necessário digitar uma observação sobre o retorno')
             return false
           }
         }
-        dao.saveEntrega(this.entregaAtual)
-          .then(result => {
-            // this.$uiUtil.showSuccessMessage('Entrega gravada com sucesso')
-          })
-          .catch(error => {
-            this.$uiUtil.showErrorMessage('Erro ao gravar entrega', error.message)
-          })
-          .finally(() => { // Gravando ou não a ocorrência no SQLite, tenta enviar a mesma ao servidor
-            entregaServices.saveOcorrenciasStart((count) => {
-              if (count > 0) {
-                this.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
-              }
+        if (bo.isRealizada(this.entregaAtual) || bo.isRetorno(this.entregaAtual)) { // Realizada ou Retorno
+          dao.saveEntrega(this.entregaAtual)
+            .then(result => {
+              // this.$uiUtil.showSuccessMessage('Entrega gravada com sucesso')
             })
-          })
+            .catch(error => {
+              this.$uiUtil.showErrorMessage('Erro ao gravar entrega', error.message)
+            })
+            .finally(() => { // Gravando ou não a ocorrência no SQLite, tenta enviar a mesma ao servidor
+              entregaServices.saveOcorrenciasStart((count) => {
+                if (count > 0) {
+                  this.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
+                }
+              })
+            })
+        }
       }
       return true
     },
@@ -107,6 +140,9 @@ export default {
     salvarObservacao () {
       this.entregaAtual.ocorrencia.observacao = this.observacao
       this.modalObservacao = false
+      if (bo.isRetorno(this.entregaAtual)) { // Retorno
+        this.$uiUtil.replacePage(this, this.sourcePage)
+      }
     },
     tirarFotoRecibo () {
       const vm = this
@@ -132,7 +168,7 @@ export default {
               vm.moveAndSaveFileURI(data)
             }, (error) => { // on fail
               console.log(error)
-              vm.$uiUtil.showErrorMessage('Não foi possível acessar a camera do dispositivo')
+              vm.$uiUtil.showErrorMessage('Não foi possível acessar a câmera do dispositivo')
             },
             {
               quality: 50,
@@ -182,9 +218,15 @@ export default {
     visualizarRota () {
       this.$uiUtil.gotoPage(this, 'entregarota')
     },
+    confirmarEntrega () {
+      this.onChangeConfirmaEntrega('Sim')
+    },
+    desfazerConfirmacaoEntrega () {
+      this.onChangeConfirmaEntrega('Não')
+    },
     onChangeConfirmaEntrega (newVal) {
       if (newVal === 'Sim') {
-        // valida se existe algum item que é obrigatorio tirar foto e se foi tirado a foto desse item
+        // valida se existe algum item que é obrigatório tirar foto e se foi tirado a foto do mesmo
         let validaConfirmacao = true
 
         if (!this.entregaAtual.ocorrencia.imagemReciboPath) {
@@ -207,28 +249,38 @@ export default {
         }
 
         if (validaConfirmacao) {
+          this.confirmaEntrega = 'Sim'
           this.motivoRetorno = null
           this.motivoRetornoColor = 'white'
           this.entregaAtual.ocorrencia.confirmaEntrega = newVal
           this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
           this.setMapLocalEntrega()
           this.setDataHoraEntrega()
+          this.$uiUtil.replacePage(this, this.sourcePage)
         } else {
           this.confirmaEntrega = 'Não'
           this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
         }
+      } else {
+        this.confirmaEntrega = 'Não'
+        this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
       }
     },
     onChangeMotivoRetorno (newVal) {
       this.motivoRetornoColor = 'red-3'
       this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = newVal
-      if (this.confirmaEntrega === 'Sim') {
-        this.confirmaEntrega = 'Não'
-        this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
-      }
+      // if (this.confirmaEntrega === 'Sim') {
+      this.confirmaEntrega = 'Não'
+      this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
+      // }
       this.setMapLocalEntrega()
       this.setDataHoraEntrega()
       this.adicionarObservacao()
+    },
+    desfazerRetorno () {
+      this.motivoRetorno = null
+      this.motivoRetornoColor = 'white'
+      this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
     },
     setDataHoraEntrega () {
       var date = new Date()
@@ -268,10 +320,18 @@ export default {
     this.motivoRetorno = this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno ? this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno : null
     this.motivoRetornoColor = this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno ? 'red-3' : 'white'
 
-    if (this.entregaAtual.ocorrencia.imagemReciboPath !== null) {
+    if (this.entregaAtual.ocorrencia.imagemReciboPath && this.entregaAtual.ocorrencia.imagemReciboPath !== null) {
       this.fotoReciboStatus.icon = 'check'
       this.fotoReciboStatus.color = 'positive'
     }
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+      if (from.name.startsWith('entregas')) {
+        vm.sourcePage = from.name
+        console.log(vm.sourcePage)
+      }
+    })
   }
 }
 </script>
