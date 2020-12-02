@@ -1,24 +1,61 @@
 <template>
   <!--<q-page class="flex flex-center">-->
-  <q-page padding class="row justify-center">
+  <q-page
+    padding
+    class="row justify-center"
+  >
     <div style="width: 500px; max-width: 90vw;">
       <div class="q-headline">Entrega</div>
       <q-field :label="entregaAtual.descricao"></q-field>
       <q-field :label="entregaAtual.endereco"></q-field>
-      <q-btn v-if="entregaAtual.address || (entregaAtual.latitudeentrega && entregaAtual.longitudeentrega)" rounded push glossy color="primary" icon="directions" label="Visualizar Rota" size="md" class="full-width" @click="visualizarRota" />
+      <q-btn
+        v-if="entregaAtual.address || (entregaAtual.latitudeentrega && entregaAtual.longitudeentrega)"
+        rounded
+        push
+        glossy
+        color="primary"
+        icon="directions"
+        label="Visualizar Rota"
+        size="md"
+        class="full-width"
+        @click="visualizarRota"
+      />
       <q-item-separator />
       <q-field label="Confirmação da Entrega/Retorno"></q-field>
       <div class="row">
         <div class="col-12 q-mt-sm q-mb-sm">
-          <q-btn-group class="full-width" push>
-            <q-btn @click="tirarFotoRecibo" push class="half-width" align="center" size="md" :color="fotoReciboStatus.color" label="Recibo" icon="photo_camera"></q-btn>
-            <q-btn @click="adicionarObservacao" push class="half-width" align="center" size="md" color="primary" label="Observação" icon="insert_comment"></q-btn>
+          <q-btn-group
+            class="full-width"
+            push
+          >
+            <q-btn
+              @click="tirarFotoRecibo"
+              push
+              class="half-width"
+              align="center"
+              size="md"
+              :color="fotoReciboStatus.color"
+              label="Recibo"
+              icon="photo_camera"
+              :disabled="motivoRetorno != null"
+            ></q-btn>
+            <q-btn
+              @click="adicionarObservacao"
+              push
+              class="half-width"
+              align="center"
+              size="md"
+              color="primary"
+              label="Observação"
+              icon="insert_comment"
+            ></q-btn>
           </q-btn-group>
         </div>
         <div class="row">
           <div class="col">
-            <q-btn @click="confirmarEntrega"
-              :disabled="confirmaEntrega === 'Sim'"
+            <q-btn
+              @click="confirmarEntrega"
+              :disabled="confirmaEntrega === 'Sim' || motivoRetorno != null"
               :glossy="confirmaEntrega !== 'Sim'"
               :color="(confirmaEntrega === 'Sim' ? 'positive' : 'primary')"
               :label="msgEntregaConfirmada"
@@ -27,7 +64,14 @@
             />
           </div>
           <div style="col">
-            <q-btn @click="desfazerConfirmacaoEntrega" v-show="confirmaEntrega === 'Sim'" round flat style="color: gray;" icon="undo" />
+            <q-btn
+              @click="desfazerConfirmacaoEntrega"
+              v-show="confirmaEntrega === 'Sim'"
+              round
+              flat
+              style="color: gray;"
+              icon="undo"
+            />
           </div>
         </div>
         <!--<div class="col-12 q-mt-sm q-mb-md" style="font-size:1.2em;">
@@ -36,31 +80,89 @@
       </div>
       <q-item-separator />
       <div class="row">
-        <div class="col-11"><q-select @input="onChangeMotivoRetorno" float-label="Motivo do retorno" inverted-light :color="motivoRetornoColor" separator v-model="motivoRetorno" :options="$store.state.app.motivosRetorno" /></div>
-        <div class="col-1"><q-btn @click="desfazerRetorno" v-show="motivoRetorno !== null" round flat style="color: gray;" icon="undo" /></div>
+        <div class="col-11">
+          <q-select
+            @input="onChangeMotivoRetorno"
+            float-label="Motivo do retorno"
+            inverted-light
+            :color="motivoRetornoColor"
+            separator
+            v-model="motivoRetorno"
+            :options="$store.state.app.motivosRetorno"
+          />
+        </div>
+        <div class="col-1">
+          <q-btn
+            @click="desfazerRetorno"
+            v-show="motivoRetorno !== null"
+            round
+            flat
+            style="color: gray;"
+            icon="undo"
+          />
+        </div>
       </div>
-      <q-list no-border striped class="q-mt-md dark-example">
+      <q-list
+        no-border
+        striped
+        class="q-mt-md dark-example"
+      >
         <div class="q-headline">Itens</div>
-        <q-item v-for="(item, index) in entregaAtual.itens" :key="index">
+        <q-item
+          v-for="(item, index) in entregaAtual.itens"
+          :key="index"
+        >
           <q-item-main>
             <q-item-tile label>{{ item.descricao }}</q-item-tile>
             <q-item-tile sublabel>Quantidade: {{ item.quantidade }}</q-item-tile>
-            <q-item-tile v-show="item.requerfoto == 'S' && (!item.midias || item.midias.length == 0)" label color="negative">Necessário tirar foto</q-item-tile>
+            <q-item-tile
+              v-show="showMsgFoto(item)"
+              label
+              color="negative"
+            >{{ msgFoto(item) }}</q-item-tile>
           </q-item-main>
           <q-item-side>
-            <q-btn round color="primary" icon="photo_camera" @click.native="tirarFoto(item)">
-              <q-chip v-show="item.midias && item.midias.length > 0" floating color="positive">{{ item.midias && item.midias.length }}</q-chip>
+            <q-btn
+              round
+              color="primary"
+              icon="photo_camera"
+              @click.native="tirarFoto(item)"
+            >
+              <q-chip
+                v-show="item.midias && item.midias.length > 0"
+                floating
+                color="positive"
+              >{{ item.midias && item.midias.length }}</q-chip>
             </q-btn>
           </q-item-side>
         </q-item>
       </q-list>
     </div>
 
-    <q-modal @show="onModalShowObservacao" class="modal-dark" v-model="modalObservacao" minimized position="right" :content-css="{minWidth: '90vw'}">
+    <q-modal
+      @show="onModalShowObservacao"
+      class="modal-dark"
+      v-model="modalObservacao"
+      minimized
+      position="right"
+      :content-css="{minWidth: '90vw'}"
+    >
       <div style="padding: 20px">
         <div class="q-display-1 q-mb-md">Observação</div>
-        <q-input ref="observacao" v-model="observacao" dark color="white" type="textarea" stack-label="Observação" />
-        <q-btn style="margin-top:20px" color="primary" @click="salvarObservacao" label="Salvar" />
+        <q-input
+          ref="observacao"
+          v-model="observacao"
+          dark
+          color="white"
+          type="textarea"
+          stack-label="Observação"
+        />
+        <q-btn
+          style="margin-top:20px"
+          color="primary"
+          @click="salvarObservacao"
+          label="Salvar"
+        />
       </div>
     </q-modal>
   </q-page>
@@ -114,12 +216,14 @@ export default {
         if (bo.isRealizada(this.entregaAtual) || bo.isRetorno(this.entregaAtual)) { // Realizada ou Retorno
           dao.saveEntrega(this.entregaAtual)
             .then(result => {
+              // console.log('Entrega salva', this.entregaAtual)
               // this.$uiUtil.showSuccessMessage('Entrega gravada com sucesso')
             })
             .catch(error => {
               this.$uiUtil.showErrorMessage('Erro ao gravar entrega', error.message)
             })
             .finally(() => { // Gravando ou não a ocorrência no SQLite, tenta enviar a mesma ao servidor
+              console.log('saveOcorrenciasStart')
               entregaServices.saveOcorrenciasStart((count) => {
                 if (count > 0) {
                   this.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
@@ -139,6 +243,7 @@ export default {
     },
     salvarObservacao () {
       this.entregaAtual.ocorrencia.observacao = this.observacao
+      this.entregaAtual.sync = 'false'
       this.modalObservacao = false
       if (bo.isRetorno(this.entregaAtual)) { // Retorno
         this.$uiUtil.replacePage(this, this.sourcePage)
@@ -146,7 +251,8 @@ export default {
     },
     tirarFotoRecibo () {
       const vm = this
-      if (vm.entregaAtual.ocorrencia.imagemReciboPath !== null) {
+      console.log('vm.entregaAtual.ocorrencia.imagemReciboPath', vm.entregaAtual.ocorrencia.imagemReciboPath)
+      if (vm.entregaAtual.ocorrencia.imagemReciboPath && vm.entregaAtual.ocorrencia.imagemReciboPath !== null) {
         vm.$uiUtil.showConfirmOkCancelMessage('Já existe uma imagem do recibo, deseja sobrepor essa imagem?', 'Sobrepor imagem')
           .then(() => {
             takePhoto()
@@ -207,6 +313,7 @@ export default {
         })
     },
     assignImagemRecibo (imagemReciboPath) {
+      this.entregaAtual.sync = 'false'
       this.entregaAtual.ocorrencia.imagemReciboPath = imagemReciboPath
       this.fotoReciboStatus.icon = 'check'
       this.fotoReciboStatus.color = 'positive'
@@ -225,6 +332,7 @@ export default {
       this.onChangeConfirmaEntrega('Não')
     },
     onChangeConfirmaEntrega (newVal) {
+      this.entregaAtual.sync = 'false'
       if (newVal === 'Sim') {
         // valida se existe algum item que é obrigatório tirar foto e se foi tirado a foto do mesmo
         let validaConfirmacao = true
@@ -232,16 +340,18 @@ export default {
         if (!this.entregaAtual.ocorrencia.imagemReciboPath) {
           validaConfirmacao = false
           this.$uiUtil.showErrorMessage('Obrigatório tirar foto do recibo')
-        } else {
+        } else if (this.entregaAtual.itens) {
+          let item
           for (let i = 0; i < this.entregaAtual.itens.length; i++) {
-            if (this.entregaAtual.itens[i].requerfoto === 'S') {
-              if (!this.entregaAtual.itens[i].midias) {
-                validaConfirmacao = false
-                this.$uiUtil.showErrorMessage('Obrigatório tirar foto do item ' + this.entregaAtual.itens[i].descricao)
-              } else if (this.entregaAtual.itens[i].midias) {
-                if (this.entregaAtual.itens[i].midias.length === 0) {
+            item = this.entregaAtual.itens[i]
+            if (item.numminimofotos > 0) {
+              if (!item.midias || item.midias.length < item.numminimofotos || item.midias.length > item.nummaximofotos) {
+                if (item.nummaximofotos > 0) {
                   validaConfirmacao = false
-                  this.$uiUtil.showErrorMessage('Obrigatório tirar foto do item ' + this.entregaAtual.itens[i].descricao)
+                  this.$uiUtil.showErrorMessage(`Necessário tirar ${item.numminimofotos} a ${item.nummaximofotos} fotos para o item ${item.descricao}`)
+                } else {
+                  validaConfirmacao = false
+                  this.$uiUtil.showErrorMessage(`Necessário tirar ${item.numminimofotos} ou mais fotos para o item ${item.descricao}`)
                 }
               }
             }
@@ -269,6 +379,7 @@ export default {
     onChangeMotivoRetorno (newVal) {
       this.motivoRetornoColor = 'red-3'
       this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = newVal
+      this.entregaAtual.sync = 'false'
       // if (this.confirmaEntrega === 'Sim') {
       this.confirmaEntrega = 'Não'
       this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
@@ -276,11 +387,49 @@ export default {
       this.setMapLocalEntrega()
       this.setDataHoraEntrega()
       this.adicionarObservacao()
+      if (newVal != null) {
+        this.removeRecibo()
+      }
+    },
+    removeRecibo () {
+      if (this.entregaAtual.ocorrencia.imagemReciboPath) {
+        var dataDirectory = cordova.file.externalDataDirectory
+        window.resolveLocalFileSystemURL(dataDirectory,
+          dataDirectoryEntry => { // on success
+            dataDirectoryEntry.getDirectory('imagens', { create: true },
+              dirEntry => { // on success
+                var fileName = this.entregaAtual.ocorrencia.imagemReciboPath.split('/')
+                fileName = fileName[fileName.length - 1]
+                // console.log('fullPath', dirEntry.fullPath)
+                // console.log('fileName', fileName)
+                dirEntry.getFile(fileName, { create: false },
+                  fileEntry => {
+                    fileEntry.remove(file => {
+                      this.entregaAtual.ocorrencia.imagemReciboPath = null
+                      this.fotoReciboStatus.icon = 'close'
+                      this.fotoReciboStatus.color = 'faded'
+                      console.log('recibo removido')
+                    }, (error) => {
+                      console.log(error)
+                    }, () => {
+                      console.log('arquivo não existe')
+                    })
+                  })
+              }, (error) => { // on fail
+                console.log(error)
+              })
+          }, (error) => { // on fail
+            console.log(error)
+          })
+      }
     },
     desfazerRetorno () {
       this.motivoRetorno = null
       this.motivoRetornoColor = 'white'
+      this.fotoReciboStatus.icon = 'close'
+      this.fotoReciboStatus.color = 'red-4'
       this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
+      this.entregaAtual.sync = 'false'
     },
     setDataHoraEntrega () {
       var date = new Date()
@@ -313,6 +462,21 @@ export default {
         vm.$q.loading.hide()
         console.log(error)
       }
+    },
+    msgFoto (item) {
+      if (item.numminimofotos > 0) {
+        if (!item.midias || item.midias.length < item.numminimofotos || item.midias.length > item.nummaximofotos) {
+          if (item.nummaximofotos > 0) {
+            return `Necessário tirar ${item.numminimofotos} a ${item.nummaximofotos} fotos`
+          } else {
+            return `Necessário tirar ${item.numminimofotos} ou mais fotos`
+          }
+        }
+      }
+      return null
+    },
+    showMsgFoto (item) {
+      return this.msgFoto(item) != null
     }
   },
   created () {
@@ -323,7 +487,11 @@ export default {
     if (this.entregaAtual.ocorrencia.imagemReciboPath && this.entregaAtual.ocorrencia.imagemReciboPath !== null) {
       this.fotoReciboStatus.icon = 'check'
       this.fotoReciboStatus.color = 'positive'
+    } else if (this.motivoRetorno != null) {
+      this.fotoReciboStatus.icon = 'close'
+      this.fotoReciboStatus.color = 'faded'
     }
+    console.log('this.entregaAtual', this.entregaAtual)
   },
   beforeRouteEnter (to, from, next) {
     next(vm => {

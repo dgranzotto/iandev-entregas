@@ -1,11 +1,25 @@
 <template>
-  <q-page padding class="row justify-center">
+  <q-page
+    padding
+    class="row justify-center"
+  >
     <div style="width: 500px; max-width: 90vw;">
       <div class="row">
         <div class="auto">
-          <q-btn rounded color="primary" icon="sync" label="Sincronizar" size="md" class="q-my-md" @click="salvarOcorrencias" />
+          <q-btn
+            rounded
+            color="primary"
+            icon="sync"
+            label="Sincronizar"
+            size="md"
+            class="q-my-md"
+            @click="salvarOcorrencias"
+          />
         </div>
-        <div class="auto" style="margin-top: 14px; margin-left: 10px;">
+        <div
+          class="auto"
+          style="margin-top: 14px; margin-left: 10px;"
+        >
           <span :class="dateClass">
             <small>Última atualização em<br></small>
             <small><strong>{{ $moment($store.state.app.entregasInfo.entregasLastSync).format(`DD/MM/YYYY [às] HH:mm`) }}</strong></small>
@@ -13,17 +27,56 @@
         </div>
       </div>
       <q-item-separator />
-      <q-scroll-area style="height: 75vh; max-height: 75vh;">
-        <q-list no-border striped>
-          <q-item class="itens" v-for="(item, index) in dataList" :key="index" @click.native="realizarEntrega(item)">
+      <q-field icon="search">
+        <q-input
+          v-model="filter"
+          float-label="Buscar por"
+          clearable
+        />
+      </q-field>
+      <q-scroll-area style="height: 75vh; max-height: 75vh; padding-top: 5px;">
+        <q-list
+          no-border
+          striped
+        >
+          <q-item
+            class="itens"
+            v-for="(item, index) in filteredDataList"
+            :key="index"
+            @click.native="realizarEntrega(item)"
+          >
             <q-item-main>
               <q-item-tile label>{{ item.descricao }}</q-item-tile>
               <q-item-tile sublabel>{{ item.subdescricao }}</q-item-tile>
             </q-item-main>
-            <q-item-side v-if="item.sync === 'true' && isNaoPendente(item)" class="info-icon" right icon="sync" color="green" />
-            <q-item-side v-if="item.sync === 'false' && isNaoPendente(item)" class="info-icon" right icon="sync_disabled" color="orange" />
-            <q-item-side v-if="isRealizada(item)" class="info-icon" right icon="check" color="green" />
-            <q-item-side v-if="isRetorno(item)" class="info-icon" right icon="check" color="orange" />
+            <q-item-side
+              v-if="item.sync === 'true' && isNaoPendente(item)"
+              class="info-icon"
+              right
+              icon="sync"
+              color="green"
+            />
+            <q-item-side
+              v-if="item.sync === 'false' && isNaoPendente(item)"
+              class="info-icon"
+              right
+              icon="sync_disabled"
+              color="orange"
+            />
+            <q-item-side
+              v-if="isRealizada(item)"
+              class="info-icon"
+              right
+              icon="check"
+              color="green"
+            />
+            <q-item-side
+              v-if="isRetorno(item)"
+              class="info-icon"
+              right
+              icon="check"
+              color="orange"
+            />
           </q-item>
         </q-list>
       </q-scroll-area>
@@ -51,6 +104,8 @@ export default {
   },
   data () {
     return {
+      filter: '',
+      dataListFilters: []
     }
   },
   methods: {
@@ -79,9 +134,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('app', [ 'isRealizada', 'isRetorno', 'isNaoPendente' ]),
+    ...mapGetters('app', ['isRealizada', 'isRetorno', 'isNaoPendente']),
     dateClass () {
       return bo.isToday(this.$store.state.app.entregasInfo.entregasLastSync) ? '' : 'text-negative'
+    },
+    filteredDataList () {
+      let filtered = this.dataList.filter(el => {
+        return el.descricao.toUpperCase().includes(this.filter.toUpperCase())
+      })
+      return filtered
     }
   }
 }

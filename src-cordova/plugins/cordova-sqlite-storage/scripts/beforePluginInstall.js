@@ -3,30 +3,31 @@
 // Adapted from:
 // https://github.com/AllJoyn-Cordova/cordova-plugin-alljoyn/blob/master/scripts/beforePluginInstall.js
 
-var path = require('path');
-var exec = require('child_process').exec;
+var path = require('path')
+var exec = require('child_process').exec
 
 // XXX FUTURE TBD auto-detect:
-var package_name = 'cordova-sqlite-storage';
+var package_name = 'cordova-sqlite-storage'
 
 module.exports = function (context) {
-    var Q = context.requireCordovaModule('q');
-    var deferral = new Q.defer();
+    var Q = require('q')
+    // var Q = context.requireCordovaModule('q');
+    var deferral = new Q.defer()
 
-    console.log('installing external dependencies via npm');
+    console.log('installing external dependencies via npm')
 
-    exec(   'npm install', {cwd: path.join('plugins', package_name)},
-            function (error, stdout, stderr) {
-                if (error !== null) {
-                    // XXX TODO SIGNAL FAILURE HERE.
-                    console.log('npm install of external dependencies failed: ' + error);
-                    deferral.resolve();
-                } else {
-                    console.log('npm install of external dependencies ok');
-                    deferral.resolve();
-                }
+    exec('npm install', { cwd: path.join('plugins', package_name) },
+        function (error, stdout, stderr) {
+            if (error !== null) {
+                // XXX TODO SIGNAL FAILURE HERE.
+                console.log('npm install of external dependencies failed: ' + error)
+                deferral.resolve()
+            } else {
+                console.log('npm install of external dependencies ok')
+                deferral.resolve()
             }
-    );
+        }
+    )
 
-    return deferral.promise;
-};
+    return deferral.promise
+}

@@ -22,8 +22,8 @@ module.exports = function (ctx) {
     ],
     extras: [
       ctx.theme.mat ? 'roboto-font' : null,
-      'material-icons' // optional, you are not bound to it
-      // 'ionicons',
+      'material-icons', // optional, you are not bound to it
+      // 'ionicons'
       // 'mdi',
       // 'fontawesome'
     ],
@@ -46,11 +46,12 @@ module.exports = function (ctx) {
     },
     devServer: {
       // https: true,
-      // port: 8080,
+      port: 3030,
       open: true // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!
     framework: {
+      iconSet: 'material-icons',
       components: [
         'QLayout',
         'QLayoutHeader',

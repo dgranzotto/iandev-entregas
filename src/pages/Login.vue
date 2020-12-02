@@ -1,11 +1,34 @@
 <template>
   <q-page class="flex flex-center">
-    <img alt="App Logo" src="~assets/images/iandev-entregas.png">
+    <img
+      alt="App Logo"
+      src="~assets/images/iandev-entregas.png"
+      style="max-width: 80vw;"
+    >
     <div style="width: 500px; max-width: 90vw;">
-      <q-input v-model="formLogin.usr" float-label="Usuário" />
-      <q-input v-model="formLogin.pwd" type="password" float-label="Senha" />
-      <q-input v-model="formLogin.url" float-label="Servidor" />
-      <q-btn rounded :loading="loading" color="primary" icon="vpn_key" label="Login" size="lg" class="full-width q-my-md" @click="login" />
+      <q-input
+        v-model="formLogin.usr"
+        float-label="Usuário"
+      />
+      <q-input
+        v-model="formLogin.pwd"
+        type="password"
+        float-label="Senha"
+      />
+      <q-input
+        v-model="formLogin.url"
+        float-label="Servidor"
+      />
+      <q-btn
+        rounded
+        :loading="loading"
+        color="primary"
+        icon="vpn_key"
+        label="Login"
+        size="lg"
+        class="full-width q-my-md"
+        @click="login"
+      />
     </div>
   </q-page>
 </template>
@@ -58,8 +81,6 @@ export default {
                   .finally(() => {
                     console.log(bo.getDateDescription(vm.$store.state.app.entregasInfo))
                     if (bo.isEntregasOutOfDate(vm.$store.state.app.entregasInfo)) { // base de dados local desatualizada
-                      console.log('-----')
-                      console.log(vm.$store.state.app.entregas)
                       entregaServices.saveOcorrenciasStart((count) => {
                         if (count > 0) {
                           vm.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
@@ -107,8 +128,7 @@ export default {
               .catch(error => {
                 vm.$uiUtil.showErrorMessage('Erro ao gravar informações do usuário', error.message)
               })
-          },
-          (error) => {
+          }, (error) => {
             vm.$uiUtil.showErrorMessage('Erro ao abrir base de dados', error.message)
           })
         }).catch(error => {
@@ -150,8 +170,7 @@ export default {
           } else { // base de dados inexistente
             vm.$uiUtil.showErrorMessage('Não foi possível conectar ao servidor e também não foram encontrados dados de entregas armazenados no seu dispositivo.<br>Verifique sua conexão com a internet e os dados de login e tente novamente.')
           }
-        },
-        (error) => {
+        }, (error) => {
           vm.$uiUtil.showErrorMessage('Erro ao abrir base de dados', error.message)
         })
       } // offline

@@ -2,8 +2,8 @@
 <widget id="br.com.iandev.entregas" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>IANDev Entregas</name>
     <description>Entregas de Mercadorias</description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="ajuda@iandev.com.br" href="http://iandev.com.br">
+        IANDev Sistemas Ltda.
     </author>
     <content src="index.html" />
     <plugin name="cordova-plugin-whitelist" spec="1" />
@@ -16,6 +16,14 @@
     <allow-intent href="geo:*" />
     <platform name="android">
         <allow-intent href="market:*" />
+        <splash density="land-ldpi" height="320" src="res/screen/android/res-drawable-land/drawable-ldpi/land.png" width="426" />
+        <splash density="land-mdpi" height="320" src="res/screen/android/res-drawable-land/drawable-mdpi/land.png" width="470" />
+        <splash density="land-hdpi" height="480" src="res/screen/android/res-drawable-land/drawable-hdpi/land.png" width="640" />
+        <splash density="land-xhdpi" height="720" src="res/screen/android/res-drawable-land/drawable-xhdpi/land.png" width="960" />
+        <splash density="port-ldpi" height="426" src="res/screen/android/res-drawable/drawable-ldpi/port.png" width="320" />
+        <splash density="port-mdpi" height="470" src="res/screen/android/res-drawable/drawable-mdpi/port.png" width="320" />
+        <splash density="port-hdpi" height="640" src="res/screen/android/res-drawable/drawable-hdpi/port.png" width="480" />
+        <splash density="port-xhdpi" height="960" src="res/screen/android/res-drawable/drawable-xhdpi/port.png" width="720" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
@@ -28,4 +36,9 @@
     <plugin name="cordova-plugin-file" spec="^6.0.1" />
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />
     <engine name="android" spec="^7.1.4" />
+    <preference name="SplashMaintainAspectRatio" value="true" />
+    <preference name="FadeSplashScreen" value="true" />
+    <preference name="SplashScreenDelay" value="5000" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <icon density="mdpi" height="57" src="res/icon/icon.png" width="57" />
 </widget>

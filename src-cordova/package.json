@@ -27,10 +27,14 @@
             "cordova-plugin-camera": {},
             "cordova-sqlite-storage": {},
             "cordova-plugin-file": {},
-            "cordova-plugin-network-information": {}
+            "cordova-plugin-network-information": {},
+            "cordova-plugin-splashscreen": {}
         },
         "platforms": [
             "android"
         ]
+    },
+    "devDependencies": {
+        "cordova-plugin-splashscreen": "^6.0.0"
     }
 }
