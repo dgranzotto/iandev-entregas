@@ -45,7 +45,10 @@ export default {
   },
   getRealizadas (entregas) {
     let realizadas = []
-    let len = entregas.length
+    let len = 0
+    if (entregas) {
+      len = entregas.length
+    }
     for (let i = 0; i < len; i++) {
       if (this.isRealizada(entregas[i])) {
         realizadas.push(entregas[i])
@@ -55,7 +58,10 @@ export default {
   },
   getRetornos (entregas) {
     let retornos = []
-    let len = entregas.length
+    let len = 0
+    if (entregas) {
+      len = entregas.length
+    }
     for (let i = 0; i < len; i++) {
       if (this.isRetorno(entregas[i])) {
         retornos.push(entregas[i])
@@ -65,7 +71,10 @@ export default {
   },
   getNaoPendentes (entregas) {
     let naoPendentes = []
-    let len = entregas.length
+    let len = 0
+    if (entregas) {
+      len = entregas.length
+    }
     for (let i = 0; i < len; i++) {
       if (this.isNaoPendente(entregas[i])) {
         naoPendentes.push(entregas[i])
@@ -75,7 +84,10 @@ export default {
   },
   getPendentes (entregas) {
     let pendentes = []
-    let len = entregas.length
+    let len = 0
+    if (entregas) {
+      len = entregas.length
+    }
     for (let i = 0; i < len; i++) {
       if (this.isPendente(entregas[i])) {
         pendentes.push(entregas[i])

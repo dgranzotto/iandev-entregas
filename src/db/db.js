@@ -43,7 +43,7 @@ export default {
     db = window.sqlitePlugin.openDatabase({
       name: userSession.dbName,
       location: 'default'
-    }, function (db) {
+    }, (db) => {
       db.transaction((tx) => {
         this.tableExists('MotivoRetorno', tx, (exists) => {
           console.log(`Database ${userSession.dbName} existent`)

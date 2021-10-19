@@ -38,7 +38,7 @@
               <q-knob
                 disable
                 :min="0"
-                :max="$store.state.app.entregas.length"
+                :max="9999999"
                 color="green"
                 size="80px"
                 line-width="3px"
@@ -63,7 +63,7 @@
               <q-knob
                 disable
                 :min="0"
-                :max="$store.state.app.entregas.length"
+                :max="9999999"
                 color="orange"
                 size="80px"
                 line-width="3px"
@@ -88,7 +88,7 @@
               <q-knob
                 disable
                 :min="0"
-                :max="$store.state.app.entregas.length"
+                :max="9999999"
                 color="red"
                 size="80px"
                 line-width="3px"
