@@ -140,6 +140,7 @@ export default {
           if (exists) { // base de dados existente
             dao.getUserInfo()
               .then(result => {
+                vm.loading = false
                 vm.$store.commit('session/setUserInfo', result)
                 dao.getEntregasInfo()
                   .then(result => {

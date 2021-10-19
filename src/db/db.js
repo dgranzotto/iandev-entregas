@@ -1,3 +1,5 @@
+import network from '../util/network'
+
 let db = null
 
 export default {
@@ -262,11 +264,15 @@ export default {
     })
   },
   tableExists (tableName, tx, success, error) {
-    tx.executeSql(`SELECT COUNT(*) AS c FROM sqlite_master WHERE type = 'table' AND name = '${tableName}'`, [], (tx, r) => {
-      success && success(r.rows.item(0).c > 0)
-    }, (e) => {
-      error && error(e)
-    })
+    if (network.isOnline()) { // online
+      tx.executeSql(`SELECT COUNT(*) AS c FROM sqlite_master WHERE type = 'table' AND name = '${tableName}'`, [], (tx, r) => {
+        success && success(r.rows.item(0).c > 0)
+      }, (e) => {
+        error && error(e)
+      })
+    } else { // offline
+      return true
+    }
   },
   transaction (execute, error, success) {
     db.transaction(execute, error, success)
