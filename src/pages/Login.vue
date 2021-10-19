@@ -140,17 +140,22 @@ export default {
           if (exists) { // base de dados existente
             dao.getUserInfo()
               .then(result => {
-                vm.loading = false
+                console.log('getuserinfo', result)
                 vm.$store.commit('session/setUserInfo', result)
                 dao.getEntregasInfo()
                   .then(result => {
+                    console.log('getEntregasInfo', result)
                     vm.$store.commit('app/setEntregasInfo', result)
                     dao.getEntregas()
                       .then(result => {
-                        vm.$store.commit('app/setEntregas', result)
                         dao.getMotivosRetorno()
-                          .then(result => {
-                            vm.$store.commit('app/setMotivosRetorno', result)
+                          .then(result2 => {
+                            let payload = {
+                              entregas: result,
+                              motivosretorno: result2,
+                              local: true
+                            }
+                            vm.$store.commit('app/setEntregas', payload)
                             vm.$uiUtil.gotoPage(vm, 'home')
                           })
                           .catch(error => {
