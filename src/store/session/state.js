@@ -1,10 +1,11 @@
 export default {
   userSession: {
-    usr: 'motorista',
+    usr: 'Motorista',
     pwd: '1',
     pwdHash: null,
-    url: 'server1iandev.no-ip.org:38080',
-    lastLogin: null
+    url: 'home.iandev.com.br:38080',
+    lastLogin: null,
+    newLogin: true
   },
   userInfo: {
     idusuario: null,
@@ -24,6 +25,7 @@ export default {
     }
   },
   userPrefs: {
-    timezone: ''
+    timezone: '',
+    statusButton: true
   }
 }

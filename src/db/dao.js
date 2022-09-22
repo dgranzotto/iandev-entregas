@@ -63,7 +63,7 @@ export default {
       console.log('Getting Entregas Info...')
       db.transaction((tx) => {
         db.getSetup('entregasInfo', tx, (entregasInfo) => {
-          console.log(`Entregas Info read: ${entregasInfo}`)
+          console.log(`Entregas Info reads: ${JSON.stringify(entregasInfo)}`)
           if (entregasInfo) {
             entregasInfo.entregasLastSync = new Date(entregasInfo.entregasLastSync)
           }

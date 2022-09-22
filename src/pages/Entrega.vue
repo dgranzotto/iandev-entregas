@@ -4,15 +4,13 @@
     padding
     class="row justify-center"
   >
-    <div style="width: 500px; max-width: 90vw;">
-      <div class="q-headline">Entrega</div>
+    <div style="width: 500px; max-width: 90vw; margin-top:60px!important;">
       <q-field :label="entregaAtual.descricao"></q-field>
       <q-field :label="entregaAtual.endereco"></q-field>
+      <q-field :label="entregaAtual.observacaoentrega"></q-field>
       <q-btn
         v-if="entregaAtual.address || (entregaAtual.latitudeentrega && entregaAtual.longitudeentrega)"
-        rounded
         push
-        glossy
         color="primary"
         icon="directions"
         label="Visualizar Rota"
@@ -51,22 +49,22 @@
             ></q-btn>
           </q-btn-group>
         </div>
-        <div class="row">
-          <div class="col">
+        <div class="row full-width">
+          <div class="col full-width">
             <q-btn
               @click="confirmarEntrega"
               :disabled="confirmaEntrega === 'Sim' || motivoRetorno != null"
-              :glossy="confirmaEntrega !== 'Sim'"
-              :color="(confirmaEntrega === 'Sim' ? 'positive' : 'primary')"
+              color="positive"
               :label="msgEntregaConfirmada"
-              rounded
-              size="lg"
+              size="md"
+              class="full-width"
+              style="padding:15px;"
             />
           </div>
-          <div style="col">
+          <div>
             <q-btn
               @click="desfazerConfirmacaoEntrega"
-              v-show="confirmaEntrega === 'Sim'"
+              v-if="confirmaEntrega === 'Sim'"
               round
               flat
               style="color: gray;"
@@ -79,8 +77,8 @@
         </div>-->
       </div>
       <q-item-separator />
-      <div class="row">
-        <div class="col-11">
+      <div class="row full-width">
+        <div class="col full-width">
           <q-select
             @input="onChangeMotivoRetorno"
             float-label="Motivo do retorno"
@@ -89,19 +87,21 @@
             separator
             v-model="motivoRetorno"
             :options="$store.state.app.motivosRetorno"
+            class="full-width"
           />
         </div>
-        <div class="col-1">
+        <div>
           <q-btn
             @click="desfazerRetorno"
-            v-show="motivoRetorno !== null"
+            v-if="motivoRetorno !== null"
             round
             flat
-            style="color: gray;"
+            style="color: gray; margin-top:5px;"
             icon="undo"
           />
         </div>
       </div>
+      <q-item-separator />
       <q-list
         no-border
         striped
@@ -331,12 +331,18 @@ export default {
     desfazerConfirmacaoEntrega () {
       this.onChangeConfirmaEntrega('Não')
     },
-    onChangeConfirmaEntrega (newVal) {
+    getLocationPromise () {
+      return new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, { maximumAge: 0, timeout: 45000, enableHighAccuracy: true })
+      )
+    },
+    async onChangeConfirmaEntrega (newVal) {
+      const vm = this
       this.entregaAtual.sync = 'false'
       if (newVal === 'Sim') {
         // valida se existe algum item que é obrigatório tirar foto e se foi tirado a foto do mesmo
         let validaConfirmacao = true
-
+        vm.$q.loading.show()
         if (!this.entregaAtual.ocorrencia.imagemReciboPath) {
           validaConfirmacao = false
           this.$uiUtil.showErrorMessage('Obrigatório tirar foto do recibo')
@@ -357,39 +363,89 @@ export default {
             }
           }
         }
-
-        if (validaConfirmacao) {
-          this.confirmaEntrega = 'Sim'
-          this.motivoRetorno = null
-          this.motivoRetornoColor = 'white'
-          this.entregaAtual.ocorrencia.confirmaEntrega = newVal
-          this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
-          this.setMapLocalEntrega()
-          this.setDataHoraEntrega()
-          this.$uiUtil.replacePage(this, this.sourcePage)
-        } else {
-          this.confirmaEntrega = 'Não'
-          this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
+        if (window.cordova) {
+          cordova.plugins.diagnostic.isLocationEnabled(function (enabled) {
+            if (!enabled) {
+              cordova.plugins.diagnostic.switchToLocationSettings()
+            }
+          }, function (error) {
+            console.log(error)
+          })
         }
+        await this.getLocationPromise()
+          .then((res) => {
+            const { coords } = res
+            if (validaConfirmacao) {
+              vm.entregaAtual.ocorrencia.latitudeConfirmacaoEntrega = coords.latitude
+              vm.entregaAtual.ocorrencia.longitudeConfirmacaoEntrega = coords.longitude
+              this.$nextTick(function () {
+                setTimeout(() => {
+                  this.confirmaEntrega = 'Sim'
+                  this.motivoRetorno = null
+                  this.motivoRetornoColor = 'white'
+                  this.entregaAtual.ocorrencia.confirmaEntrega = newVal
+                  this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
+                  this.setDataHoraEntrega()
+                  this.$nextTick(function () {
+                    setTimeout(() => {
+                      console.log('latitude: ' + vm.entregaAtual.ocorrencia.latitudeConfirmacaoEntrega + ' | longitude: ' + vm.entregaAtual.ocorrencia.longitudeConfirmacaoEntrega)
+                      this.$uiUtil.replacePage(this, this.sourcePage)
+                    }, 500)
+                  })
+                }, 500)
+              })
+            } else {
+              this.confirmaEntrega = 'Não'
+              this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
+            }
+            vm.$q.loading.hide()
+          })
+          .catch((error) => {
+            console.log(`Erro: ${error.message}`)
+            this.$uiUtil.showErrorMessage('Obrigatório permitir que o APP acesse sua localização')
+            vm.$q.loading.hide()
+          })
       } else {
         this.confirmaEntrega = 'Não'
         this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
       }
     },
-    onChangeMotivoRetorno (newVal) {
-      this.motivoRetornoColor = 'red-3'
-      this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = newVal
-      this.entregaAtual.sync = 'false'
-      // if (this.confirmaEntrega === 'Sim') {
-      this.confirmaEntrega = 'Não'
-      this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
-      // }
-      this.setMapLocalEntrega()
-      this.setDataHoraEntrega()
-      this.adicionarObservacao()
-      if (newVal != null) {
-        this.removeRecibo()
+    async onChangeMotivoRetorno (newVal) {
+      const vm = this
+      if (window.cordova) {
+        cordova.plugins.diagnostic.isLocationEnabled(function (enabled) {
+          if (!enabled) {
+            cordova.plugins.diagnostic.switchToLocationSettings()
+          }
+        }, function (error) {
+          console.log(error)
+        })
       }
+      await this.getLocationPromise()
+        .then((res) => {
+          const { coords } = res
+          vm.entregaAtual.ocorrencia.latitudeConfirmacaoEntrega = coords.latitude
+          vm.entregaAtual.ocorrencia.longitudeConfirmacaoEntrega = coords.longitude
+          this.$nextTick(function () {
+            setTimeout(() => {
+              this.motivoRetornoColor = 'red-3'
+              this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = newVal
+              this.entregaAtual.sync = 'false'
+              this.confirmaEntrega = 'Não'
+              this.entregaAtual.ocorrencia.confirmaEntrega = this.confirmaEntrega
+              this.setDataHoraEntrega()
+              this.adicionarObservacao()
+              if (newVal != null) {
+                this.removeRecibo()
+              }
+            }, 500)
+          })
+        })
+        .catch((error) => {
+          console.log(`Erro: ${error.message}`)
+          this.$uiUtil.showErrorMessage('Obrigatório permitir que o APP acesse sua localização')
+          vm.$q.loading.hide()
+        })
     },
     removeRecibo () {
       if (this.entregaAtual.ocorrencia.imagemReciboPath) {
@@ -435,33 +491,6 @@ export default {
       var date = new Date()
       this.entregaAtual.ocorrencia.data = this.$moment(date).format('YYYY-MM-DD')
       this.entregaAtual.ocorrencia.hora = this.$moment(date).format('HH:mm:ss')
-    },
-    setMapLocalEntrega () {
-      const vm = this
-      vm.$q.loading.show()
-
-      if (window.cordova) {
-        cordova.plugins.diagnostic.isLocationEnabled(function (enabled) {
-          if (!enabled) {
-            cordova.plugins.diagnostic.switchToLocationSettings()
-          }
-        }, function (error) {
-          console.log(error)
-        })
-      }
-
-      navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: true, timeout: 120000 })
-
-      //  Callback functions
-      function onMapSuccess (position) {
-        vm.entregaAtual.ocorrencia.latitudeConfirmacaoEntrega = position.coords.latitude
-        vm.entregaAtual.ocorrencia.longitudeConfirmacaoEntrega = position.coords.longitude
-        vm.$q.loading.hide()
-      }
-      function onMapError (error) {
-        vm.$q.loading.hide()
-        console.log(error)
-      }
     },
     msgFoto (item) {
       if (item.numminimofotos > 0) {

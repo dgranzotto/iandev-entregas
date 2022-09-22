@@ -1,5 +1,6 @@
 import file from '../util/file'
 import moment from 'moment-timezone'
+import store from '../store'
 
 // const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 2 // 2 dias
 const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 1 // 1 dia
@@ -21,8 +22,32 @@ export default {
   isPendente (entrega) {
     return !this.isRealizada(entrega) && !this.isRetorno(entrega)
   },
+  deleteFolder () {
+    window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, this.onFileSystemDirSuccessFiles, function (error) { console.log(error) })
+  },
+  onFileSystemDirSuccessFiles (fileSystem) {
+    var entry = ''
+    entry = fileSystem
+    entry.getDirectory('imagens', {
+      create: true,
+      exclusive: false
+    },
+    function (entry) {
+      entry.removeRecursively(function () {
+        console.log('Delete successful !!!')
+      }, function (error) { console.log(error) })
+    }, function (error) { console.log(error) })
+  },
   isEntregasOutOfDate (entregasInfo) {
-    return !(entregasInfo && entregasInfo.entregasLastSync && new Date().getTime() - entregasInfo.entregasLastSync.getTime() < ENTREGAS_OUT_OF_DATE)
+    if (store.state.session.userSession.newLogin) {
+      this.deleteFolder()
+      return true
+    } else if (!(entregasInfo && entregasInfo.entregasLastSync && new Date().getTime() - entregasInfo.entregasLastSync.getTime() < ENTREGAS_OUT_OF_DATE)) {
+      this.deleteFolder()
+      return true
+    } else {
+      return false
+    }
   },
   getTimeOutOfDate (entregasInfo) {
     if (entregasInfo && entregasInfo.entregasLastSync) {

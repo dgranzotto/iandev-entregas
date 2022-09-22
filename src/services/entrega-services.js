@@ -2,41 +2,47 @@ import bo from '../bo/entrega-bo'
 import dao from '../db/dao'
 import file from '../util/file'
 import store from '../store'
+import db from '../db/db'
 
 export default {
   getEntregas () {
-    return store.state.app.axios.get('bdoserver2.7/CntServlet', { params: this.getParams('get-entregas') })
-      .then(response => {
-        if (response.headers['result'] === 'ok') {
-          console.log(response)
-          store.commit('app/setEntregas', response.data)
-          dao.saveEntregas(store.state.app.entregas)
-            .then(result => {
-              console.log('Entregas gravadas com sucesso')
-              dao.saveMotivosRetorno(store.state.app.motivosRetorno)
-                .then(result => {
-                  console.log('Motivos de retorno gravados com sucesso')
-                  dao.saveEntregasInfo(store.state.app.entregasInfo)
-                    .then(result => {
-                      console.log('Informações das entregas gravadas com sucesso')
-                      return Promise.resolve(response)
-                    })
-                })
-            })
-        } else {
-          store.commit('app/setEntregasLastAttempt', 'error', 'Erro ao buscar entregas')
-          return Promise.reject(new Error(response.headers['result']))
-        }
-      })
-      .catch(error => {
-        console.log(error)
-        return Promise.reject(error)
-      })
+    if (store.state.session.userPrefs.statusButton) {
+      db.cleanTables()
+      return store.state.app.axios.get('bdoserver2.7/CntServlet', { params: this.getParams('get-entregas') })
+        .then(response => {
+          if (response.headers['result'] === 'ok') {
+            console.log(response)
+            store.commit('app/setEntregas', response.data)
+            dao.saveEntregas(store.state.app.entregas)
+              .then(result => {
+                console.log('Entregas gravadas com sucesso')
+                dao.saveMotivosRetorno(store.state.app.motivosRetorno)
+                  .then(result => {
+                    console.log('Motivos de retorno gravados com sucesso')
+                    dao.saveEntregasInfo(store.state.app.entregasInfo)
+                      .then(result => {
+                        console.log('Informações das entregas gravadas com sucesso')
+                        return Promise.resolve(response)
+                      })
+                  })
+              })
+          } else {
+            store.commit('app/setEntregasLastAttempt', 'error', 'Erro ao buscar entregas')
+            return Promise.reject(new Error(response.headers['result']))
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          return Promise.reject(error)
+        })
+    }
   },
   saveOcorrenciasStart (success, error) {
-    let naoPendentes = bo.getNaoPendentes(store.state.app.entregas)
-    console.log('Não Pendentes:', naoPendentes)
-    this.saveOcorrencias(naoPendentes, success, error)
+    if (store.state.session.userPrefs.statusButton) {
+      let naoPendentes = bo.getNaoPendentes(store.state.app.entregas)
+      console.log('Não Pendentes:', naoPendentes)
+      this.saveOcorrencias(naoPendentes, success, error)
+    }
   },
   saveOcorrencias (entregas, success, error, idx, count) {
     if (entregas.length === 0) {
@@ -85,49 +91,53 @@ export default {
     }
   },
   saveOcorrencia (entrega, success, error) {
-    let setSyncing = !store.state.app.env.syncing
-    if (setSyncing) {
-      store.commit('app/setSyncing', true)
+    if (store.state.session.userPrefs.statusButton) {
+      let setSyncing = !store.state.app.env.syncing
+      if (setSyncing) {
+        store.commit('app/setSyncing', true)
+      }
+      let ocorrencia = Object.assign(entrega.ocorrencia, bo.getIdEntrega(entrega))
+      console.log('Sending ocorrencia', ocorrencia)
+      return store.state.app.axios.post('bdoserver2.7/CntServlet', 'ocorrencia=' + JSON.stringify(ocorrencia), { params: this.getParams('save-ocorrencia') })
+        .then(response => {
+          if (response.headers['result'] === 'ok') {
+            // console.log(response)
+            // console.log(entrega)
+            entrega.ocorrencia.idcargaentregaocorrencia = response.data.entity.idcargaentregaocorrencia
+            this.saveMidiasStart(entrega, (count) => {
+              if (count >= 0) {
+                entrega.sync = 'true'
+                success && success(entrega)
+              } else {
+                console.log('Erro ao enviar midias')
+                error && error('Erro ao enviar midias')
+              }
+            }, (err) => {
+              console.log(err)
+              error && error(err)
+            })
+          } else {
+            console.log('Erro ao salvar ocorrência')
+            error && error('Erro ao salvar ocorrência')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          error && error(err)
+        })
+        .finally(() => {
+          if (setSyncing) {
+            store.commit('app/setSyncing', false)
+          }
+        })
     }
-    let ocorrencia = Object.assign(entrega.ocorrencia, bo.getIdEntrega(entrega))
-    console.log('Sending ocorrencia', ocorrencia)
-    return store.state.app.axios.post('bdoserver2.7/CntServlet', 'ocorrencia=' + JSON.stringify(ocorrencia), { params: this.getParams('save-ocorrencia') })
-      .then(response => {
-        if (response.headers['result'] === 'ok') {
-          // console.log(response)
-          // console.log(entrega)
-          entrega.ocorrencia.idcargaentregaocorrencia = response.data.entity.idcargaentregaocorrencia
-          this.saveMidiasStart(entrega, (count) => {
-            if (count >= 0) {
-              entrega.sync = 'true'
-              success && success(entrega)
-            } else {
-              console.log('Erro ao enviar midias')
-              error && error('Erro ao enviar midias')
-            }
-          }, (err) => {
-            console.log(err)
-            error && error(err)
-          })
-        } else {
-          console.log('Erro ao salvar ocorrência')
-          error && error('Erro ao salvar ocorrência')
-        }
-      })
-      .catch(err => {
-        console.log(err)
-        error && error(err)
-      })
-      .finally(() => {
-        if (setSyncing) {
-          store.commit('app/setSyncing', false)
-        }
-      })
   },
   saveMidiasStart (entrega, success, error) {
-    let midias = bo.getArrayOfMidias(entrega)
-    console.log('Midias: ', midias)
-    this.saveMidias(midias, success, error)
+    if (store.state.session.userPrefs.statusButton) {
+      let midias = bo.getArrayOfMidias(entrega)
+      console.log('Midias: ', midias)
+      this.saveMidias(midias, success, error)
+    }
   },
   saveMidias (midias, success, error, idx) {
     if (midias.length === 0) {

@@ -1,7 +1,7 @@
 <template>
   <!--<q-page class="flex flex-center">-->
   <q-page padding class="row justify-center">
-    <div style="width: 500px; max-width: 90vw;">
+    <div style="width: 500px; max-width: 90vw; margin-top:80px!important;">
       <div id="map"></div>
     </div>
   </q-page>

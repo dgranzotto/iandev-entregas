@@ -14,6 +14,7 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <allow-navigation href="https://*" />
     <platform name="android">
         <allow-intent href="market:*" />
         <splash density="land-ldpi" height="320" src="res/screen/android/res-drawable-land/drawable-ldpi/land.png" width="426" />
@@ -40,5 +41,6 @@
     <preference name="FadeSplashScreen" value="true" />
     <preference name="SplashScreenDelay" value="5000" />
     <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="Scheme" value="https" />
     <icon density="mdpi" height="57" src="res/icon/icon.png" width="57" />
 </widget>

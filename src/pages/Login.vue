@@ -3,7 +3,7 @@
     <img
       alt="App Logo"
       src="~assets/images/iandev-entregas.png"
-      style="max-width: 80vw;"
+      style="max-width: 80vw; margin-top:60px!important;"
     >
     <div style="width: 500px; max-width: 90vw;">
       <q-input
@@ -59,6 +59,7 @@ export default {
     login () {
       this.loading = true
       const vm = this
+      console.log(network.isOnline())
       if (network.isOnline()) { // online
         console.log('Realizando login...')
         vm.$store.dispatch('session/login', vm.formLogin).then(response => { // login no OD
@@ -92,7 +93,6 @@ export default {
                           vm.$store.dispatch('app/getEntregas')
                             .then(response => {
                               console.log('Entregas atualizadas a partir do servidor com sucesso')
-                              // vm.$uiUtil.showSuccessMessage('Entregas atualizadas a partir do servidor com sucesso')
                               vm.$uiUtil.gotoPage(vm, 'home')
                             })
                         }
@@ -112,7 +112,11 @@ export default {
                                 motivosretorno: result2,
                                 local: true
                               }
-                              vm.$store.commit('app/setEntregas', payload)
+                              this.$nextTick(function () {
+                                setTimeout(() => {
+                                  vm.$store.commit('app/setEntregas', payload)
+                                }, 500)
+                              })
                               vm.$uiUtil.gotoPage(vm, 'home')
                             })
                             .catch(error => {
@@ -141,6 +145,7 @@ export default {
             dao.getUserInfo()
               .then(result => {
                 console.log('getuserinfo', result)
+                vm.loading = false
                 vm.$store.commit('session/setUserInfo', result)
                 dao.getEntregasInfo()
                   .then(result => {
@@ -171,10 +176,12 @@ export default {
                   })
               })
               .catch(error => {
+                vm.loading = false
                 vm.$uiUtil.showErrorMessage('Erro ao ler informações do usuário', error.message)
               })
           } else { // base de dados inexistente
-            vm.$uiUtil.showErrorMessage('Não foi possível conectar ao servidor e também não foram encontrados dados de entregas armazenados no seu dispositivo.<br>Verifique sua conexão com a internet e os dados de login e tente novamente.')
+            vm.loading = false
+            vm.$uiUtil.showErrorMessage('Não foi possível conectar ao servidor e também não foram encontrados dados de entregas armazenados no seu dispositivo.\n Verifique sua conexão com a internet e os dados de login e tente novamente.')
           }
         }, (error) => {
           vm.$uiUtil.showErrorMessage('Erro ao abrir base de dados', error.message)

@@ -1,4 +1,5 @@
 ﻿import Connection from '../util/Connection'
+import store from '../store'
 
 export default {
   getNetworkState () {
@@ -30,6 +31,7 @@ export default {
   },
   isOnline () {
     let networkState = this.getNetworkState()
-    return networkState !== Connection.NONE
+    console.log(networkState !== Connection.NONE && store.state.session.userPrefs.statusButton !== false)
+    return networkState !== Connection.NONE && store.state.session.userPrefs.statusButton !== false
   }
 }

@@ -75,6 +75,11 @@ export default {
       console.log('Database initialized')
     })
   },
+  cleanTables () {
+    db.executeSql('DELETE FROM Entrega')
+    db.executeSql('DELETE FROM MotivoRetorno')
+    console.log('cleanTables')
+  },
   dumpDB () {
     db.transaction((tx) => {
       console.log('Dumping Database')
@@ -140,6 +145,7 @@ export default {
   getSetup (idsetup, tx, success, error) {
     tx.executeSql(`SELECT jsonobject FROM Setup WHERE idsetup = '${idsetup}'`, [], (tx, r) => {
       let setup = (r.rows.length > 0 ? JSON.parse(r.rows.item(0).jsonobject) : null)
+      // console.log('getSetup ' + JSON.parse(r.rows.item(0).jsonobject))
       success && success(setup)
     }, (e) => {
       error && error(e)
@@ -185,6 +191,7 @@ export default {
     const len = entregas.length
     for (let i = 0; i < len; i++) {
       this.saveEntrega(entregas[i], tx)
+      // console.log('saveEntregas ' + entregas[i])
     }
     success && success(`${len} Entregas inserted`)
   },

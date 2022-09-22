@@ -14,7 +14,15 @@
           {{ $route.meta.title || 'IANDev Entregas'}}
         </q-toolbar-title>
         <q-spinner-rings style="margin-right: 5px;" v-show="env.syncing" color="write" :size="30" />
-        <q-icon :name="env.networkIcon" />
+        <q-btn
+          rounded
+          :color="!$store.state.session.userPrefs.statusButton ? 'red' : 'green'"
+          :label="!$store.state.session.userPrefs.statusButton ? 'Modo Offline' : 'Disponível'"
+          :icon="!$store.state.session.userPrefs.statusButton ? 'signal_cellular_off' : env.networkIcon"
+          class="q-my-xs"
+          style="font-size: 10px;"
+          @click="changeStatus(!$store.state.session.userPrefs.statusButton)"
+        />
       </q-toolbar>
     </q-layout-header>
     <q-layout-drawer
@@ -51,16 +59,25 @@
         </q-item>
       </q-list>
     </q-layout-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
   </q-layout>
 </template>
 
+<style>
+  .layout-padding {
+    padding: unset!important;
+  }
+  .q-layout-page-container {
+    padding-top: unset!important;
+  }
+</style>
+
 <script>
 import { openURL } from 'quasar'
 import { mapState } from 'vuex'
+import store from '../store'
 
 export default {
   name: 'MainLayout',
@@ -87,6 +104,10 @@ export default {
         evt.stopPropagation()
       }
       navigator.app.exitApp()
+    },
+    changeStatus (status) {
+      console.log('alterando status do botão ' + status)
+      store.commit('session/setStatusButton', status)
     }
   },
   computed: {

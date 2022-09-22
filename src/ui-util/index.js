@@ -21,7 +21,7 @@ export default {
   },
   showErrorMessage (message, detail) {
     if (detail) {
-      message = message + '<p>' + detail
+      message = message + ' ' + detail
     }
     Notify.create({ message, type: 'negative', position: 'top' })
   },

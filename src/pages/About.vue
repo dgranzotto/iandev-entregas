@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <div style="width: 500px; max-width: 90vw;">
+    <div style="width: 500px; max-width: 90vw; margin-top:40px!important;">
       <div class="q-headline">IANDev Entregas</div>
       <q-field label="Versão">
         <q-input
@@ -15,7 +15,7 @@
       src="~assets/images/iandev-entregas.png"
       style="max-width: 80vw;"
     />
-    <p class="caption">&copy; Copyright 2009-2019&nbsp;&nbsp;&nbsp;IANDev Sistemas</p>
+    <p class="caption">&copy; Copyright 2009-2022&nbsp;&nbsp;&nbsp;IANDev Sistemas</p>
   </q-page>
 </template>
 
@@ -27,7 +27,7 @@ export default {
   name: 'PageAbout',
   data () {
     return {
-      version: '20.12.02'
+      version: '22.09.21'
     }
   }
 }

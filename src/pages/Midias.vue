@@ -167,7 +167,7 @@ export default {
           }, (error) => { // on fail
             console.log(error)
             var mensagem = (error === 'No Image Selected' ? 'Nenhuma imagem capturada' : null)
-            this.$uiUtil.showErrorMessage(mensagem || 'Não foi possível acessar a camera do dispositivo')
+            this.$uiUtil.showErrorMessage(mensagem || 'Não foi possível acessar a câmera do dispositivo')
           },
           {
             quality: 50,

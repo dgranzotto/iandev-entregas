@@ -6,21 +6,32 @@
         <img
           alt="App Logo"
           src="~assets/images/iandev-entregas.png"
-          style="max-width: 80vw;"
+          style="max-width: 80vw; margin-top:68px!important;"
         />
       </div>
     </div>
     <div class="row justify-center">
       <div class="col-xs-12 q-pa-sm">
-        <q-btn
-          rounded
-          color="primary"
-          icon="local_shipping"
-          label="Todas as Entregas"
-          size="lg"
-          class="full-width q-my-md"
-          @click="entregas"
-        />
+        <div style="display:flex;">
+          <q-btn
+            rounded
+            color="primary"
+            icon="local_shipping"
+            label="Todas as Entregas"
+            size="lg"
+            class="full-width q-my-md"
+            @click="entregas"
+          />
+          <q-btn
+              round
+              color="primary"
+              icon="sync"
+              size="lg"
+              class="q-my-md"
+              style="margin-left:5px; width:75px;"
+              @click="salvarOcorrencias"
+            />
+        </div>
       </div>
       <div class="row">
         <div
@@ -108,6 +119,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import bo from '../bo/entrega-bo'
+import entregaServices from '../services/entrega-services'
+import store from '../store'
 
 export default {
   name: 'PageIndex',
@@ -127,6 +141,29 @@ export default {
     },
     entregasPendentes () {
       this.$uiUtil.gotoPage(this, 'entregaspendentes')
+    },
+    salvarOcorrencias () {
+      entregaServices.saveOcorrenciasStart((count) => {
+        if (count > 0 && store.state.session.userPrefs.statusButton) {
+          this.$uiUtil.showSuccessMessage(bo.getDescEnvioOcorrenciasServer(count))
+        } else if (count < 0) {
+          this.$uiUtil.showErrorMessage(bo.getDescEnvioOcorrenciasServer(count))
+        }
+        if (count >= 0 && store.state.session.userPrefs.statusButton) {
+          console.log('Buscando entregas no servidor...')
+          this.$nextTick(function () {
+            setTimeout(() => {
+              this.$store.dispatch('app/getEntregas')
+                .then(response => {
+                  console.log('Entregas atualizadas a partir do servidor com sucesso')
+                  this.$uiUtil.showSuccessMessage('Entregas atualizadas a partir do servidor com sucesso')
+                })
+            }, 500)
+          })
+        }
+      }, (err) => {
+        this.$uiUtil.showErrorMessage('Error ao enviar ocorrências ao servidor', err)
+      })
     }
   },
   computed: {
