@@ -35,7 +35,7 @@
         ]
     },
     "devDependencies": {
-        "cordova-android": "^7.1.4",
+        "cordova-android": "^11.0.0",
         "cordova-ios": "^6.2.0",
         "cordova-plugin-splashscreen": "^6.0.0"
     }
