@@ -72,9 +72,6 @@
             />
           </div>
         </div>
-        <!--<div class="col-12 q-mt-sm q-mb-md" style="font-size:1.2em;">
-          <q-toggle @input="onChangeConfirmaEntrega" v-model="confirmaEntrega" checked-icon="check" unchecked-icon="close" left-label color="positive" label="Entrega realizada?" true-value="Sim" false-value="Não"/> {{ confirmaEntrega }}
-        </div>-->
       </div>
       <q-item-separator />
       <div class="row full-width">
@@ -107,7 +104,23 @@
         striped
         class="q-mt-md dark-example"
       >
-        <div class="q-headline">Itens</div>
+        <div class="col-12 q-mt-sm q-mb-sm">
+          <div
+            class="full-width" style="position: relative; display: flex;"
+          >
+            <div class="q-headline" style="width: 50%;">Itens</div>
+            <q-btn
+              @click="tirarFotoCarga"
+              push
+              class="half-width"
+              align="center"
+              size="sm"
+              :color="fotoCargaStatus.color"
+              label="Foto Carga"
+              icon="photo_camera"
+            ></q-btn>
+          </div>
+        </div>
         <q-item
           v-for="(item, index) in entregaAtual.itens"
           :key="index"
@@ -187,6 +200,10 @@ export default {
         icon: 'close',
         color: 'red-4'
       },
+      fotoCargaStatus: {
+        icon: 'close',
+        color: 'red-4'
+      },
       sourcePage: ''
     }
   },
@@ -213,11 +230,9 @@ export default {
             return false
           }
         }
-        if (bo.isRealizada(this.entregaAtual) || bo.isRetorno(this.entregaAtual)) { // Realizada ou Retorno
+        if (bo.isRealizada(this.entregaAtual) || bo.isRetorno(this.entregaAtual) || bo.isPendente(this.entregaAtual)) { // Realizada ou Retorno
           dao.saveEntrega(this.entregaAtual)
             .then(result => {
-              // console.log('Entrega salva', this.entregaAtual)
-              // this.$uiUtil.showSuccessMessage('Entrega gravada com sucesso')
             })
             .catch(error => {
               this.$uiUtil.showErrorMessage('Erro ao gravar entrega', error.message)
@@ -271,7 +286,7 @@ export default {
         setTimeout(
           navigator.camera.getPicture(
             (data) => { // on success
-              vm.moveAndSaveFileURI(data)
+              vm.moveAndSaveFileURI(data, 'R')
             }, (error) => { // on fail
               console.log(error)
               vm.$uiUtil.showErrorMessage('Não foi possível acessar a câmera do dispositivo')
@@ -285,7 +300,43 @@ export default {
           ), 1000)
       }
     },
-    moveAndSaveFileURI (data) {
+    tirarFotoCarga () {
+      const vm = this
+      console.log('vm.entregaAtual.ocorrencia.imagemCargaPath', vm.entregaAtual.ocorrencia.imagemCargaPath)
+      if (vm.entregaAtual.ocorrencia.imagemCargaPath && vm.entregaAtual.ocorrencia.imagemCargaoPath !== null) {
+        vm.$uiUtil.showConfirmOkCancelMessage('Já existe uma imagem da carga, deseja sobrepor essa imagem?', 'Sobrepor imagem')
+          .then(() => {
+            takePhoto()
+          }).catch(() => {
+            // do nothing
+          })
+      } else {
+        takePhoto()
+      }
+
+      function takePhoto () {
+        if (vm.$config.runningAsWebApp) {
+          vm.assignImagemCarga('xyz')
+          return
+        }
+        setTimeout(
+          navigator.camera.getPicture(
+            (data) => { // on success
+              vm.moveAndSaveFileURI(data, 'C')
+            }, (error) => { // on fail
+              console.log(error)
+              vm.$uiUtil.showErrorMessage('Não foi possível acessar a câmera do dispositivo')
+            },
+            {
+              quality: 50,
+              destinationType: Camera.DestinationType.FILE_URI,
+              encodingType: Camera.EncodingType.JPEG,
+              correctOrientation: true
+            }
+          ), 1000)
+      }
+    },
+    moveAndSaveFileURI (data, tipo) {
       var fileName = data.substring(data.lastIndexOf('/') + 1)
       window.resolveLocalFileSystemURL(data,
         fileEntry => { // on success
@@ -298,7 +349,11 @@ export default {
                   var newFileName = yyyy + '-' + mm + '-' + dd + 'R_' + fileName
                   fileEntry.moveTo(dirEntry, newFileName,
                     entry => { // on success
-                      this.assignImagemRecibo(entry.nativeURL)
+                      if (tipo === 'R') {
+                        this.assignImagemRecibo(entry.nativeURL)
+                      } else {
+                        this.assignImagemCarga(entry.nativeURL)
+                      }
                     }, (error) => { // on fail
                       console.log(error)
                     })
@@ -317,6 +372,12 @@ export default {
       this.entregaAtual.ocorrencia.imagemReciboPath = imagemReciboPath
       this.fotoReciboStatus.icon = 'check'
       this.fotoReciboStatus.color = 'positive'
+    },
+    assignImagemCarga (imagemCargaPath) {
+      this.entregaAtual.sync = 'false'
+      this.entregaAtual.ocorrencia.imagemCargaPath = imagemCargaPath
+      this.fotoCargaStatus.icon = 'check'
+      this.fotoCargaStatus.color = 'positive'
     },
     tirarFoto (item) {
       this.$store.commit('app/setItemAtual', item)
@@ -437,6 +498,7 @@ export default {
               this.adicionarObservacao()
               if (newVal != null) {
                 this.removeRecibo()
+                this.removeCarga()
               }
             }, 500)
           })
@@ -479,11 +541,45 @@ export default {
           })
       }
     },
+    removeCarga () {
+      if (this.entregaAtual.ocorrencia.imagemCargaPath) {
+        var dataDirectory = cordova.file.externalDataDirectory
+        window.resolveLocalFileSystemURL(dataDirectory,
+          dataDirectoryEntry => { // on success
+            dataDirectoryEntry.getDirectory('imagens', { create: true },
+              dirEntry => { // on success
+                var fileName = this.entregaAtual.ocorrencia.imagemCargaPath.split('/')
+                fileName = fileName[fileName.length - 1]
+                // console.log('fullPath', dirEntry.fullPath)
+                // console.log('fileName', fileName)
+                dirEntry.getFile(fileName, { create: false },
+                  fileEntry => {
+                    fileEntry.remove(file => {
+                      this.entregaAtual.ocorrencia.imagemCargaPath = null
+                      this.fotoCargaStatus.icon = 'close'
+                      this.fotoCargaStatus.color = 'faded'
+                      console.log('Imagem Carga removida')
+                    }, (error) => {
+                      console.log(error)
+                    }, () => {
+                      console.log('arquivo não existe')
+                    })
+                  })
+              }, (error) => { // on fail
+                console.log(error)
+              })
+          }, (error) => { // on fail
+            console.log(error)
+          })
+      }
+    },
     desfazerRetorno () {
       this.motivoRetorno = null
       this.motivoRetornoColor = 'white'
       this.fotoReciboStatus.icon = 'close'
       this.fotoReciboStatus.color = 'red-4'
+      this.fotoCargaStatus.icon = 'close'
+      this.fotoCargaStatus.color = 'red-4'
       this.entregaAtual.ocorrencia.idCargaEntregaMotivoRetorno = null
       this.entregaAtual.sync = 'false'
     },
@@ -519,6 +615,14 @@ export default {
     } else if (this.motivoRetorno != null) {
       this.fotoReciboStatus.icon = 'close'
       this.fotoReciboStatus.color = 'faded'
+    }
+
+    if (this.entregaAtual.ocorrencia.imagemCargaPath && this.entregaAtual.ocorrencia.imagemCargaPath !== null) {
+      this.fotoCargaStatus.icon = 'check'
+      this.fotoCargaStatus.color = 'positive'
+    } else if (this.motivoRetorno != null) {
+      this.fotoCargaStatus.icon = 'close'
+      this.fotoCargaStatus.color = 'faded'
     }
     console.log('this.entregaAtual', this.entregaAtual)
   },

@@ -33,6 +33,7 @@ export default {
       idCargaEntregaMotivoRetorno: null,
       observacao: null,
       imagemReciboPath: null,
+      imagemCargaPath: null,
       confirmaEntrega: null
     }
   }

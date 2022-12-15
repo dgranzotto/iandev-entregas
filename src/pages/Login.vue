@@ -3,7 +3,7 @@
     <img
       alt="App Logo"
       src="~assets/images/iandev-entregas.png"
-      style="max-width: 80vw; margin-top:60px!important;"
+      style="max-height: 30vh; margin-top:60px!important;"
     >
     <div style="width: 500px; max-width: 90vw;">
       <q-input

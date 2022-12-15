@@ -3,7 +3,7 @@ import moment from 'moment-timezone'
 import store from '../store'
 
 // const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 2 // 2 dias
-const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 1 // 1 dia
+const ENTREGAS_OUT_OF_DATE = 1000 * 60 * 60 * 24 * 3 // 3 dias
 // const ENTREGAS_OUT_OF_DATE = 1000 * 60 // 1 minuto
 
 export default {
@@ -125,6 +125,9 @@ export default {
     let midias = []
     if (entrega.ocorrencia.imagemReciboPath) {
       midias.push(Object.assign({ tipoMidia: 'rec', filePath: entrega.ocorrencia.imagemReciboPath, midia: '', extMidia: file.getFilenameExtension(entrega.ocorrencia.imagemReciboPath), descricao: null, idProduto: null }, idEntregaAndIdOcorrencia))
+    }
+    if (entrega.ocorrencia.imagemCargaPath) {
+      midias.push(Object.assign({ tipoMidia: 'car', filePath: entrega.ocorrencia.imagemCargaPath, midia: '', extMidia: file.getFilenameExtension(entrega.ocorrencia.imagemCargaPath), descricao: null, idProduto: null }, idEntregaAndIdOcorrencia))
     }
     let i, j
     let item, midia

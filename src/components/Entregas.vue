@@ -18,7 +18,7 @@
         </div>
         <div
           class="auto"
-          style="margin-top: 14px; position: relative; top: 28px; left: 30%;transform: translate(-50%, -50%);"
+          style="margin-top: 14px; position: relative; top: 28px; left: 26%; transform: translate(-50%, -50%);"
         >
           <span :class="dateClass">
             <small>Última atualização em<br></small>

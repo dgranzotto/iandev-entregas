@@ -13,9 +13,9 @@
     <img
       alt="App Logo"
       src="~assets/images/iandev-entregas.png"
-      style="max-width: 80vw;"
+      style="max-height: 30vh;"
     />
-    <p class="caption">&copy; Copyright 2009-2022&nbsp;&nbsp;&nbsp;IANDev Sistemas</p>
+    <p class="caption">&copy; Copyright 2009-2023&nbsp;&nbsp;&nbsp;IANDev Sistemas</p>
   </q-page>
 </template>
 
@@ -27,7 +27,7 @@ export default {
   name: 'PageAbout',
   data () {
     return {
-      version: '22.09.21'
+      version: '22.12.15'
     }
   }
 }

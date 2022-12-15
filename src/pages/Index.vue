@@ -6,7 +6,7 @@
         <img
           alt="App Logo"
           src="~assets/images/iandev-entregas.png"
-          style="max-width: 80vw; margin-top:68px!important;"
+          style="max-height: 30vh; margin-top:68px!important;"
         />
       </div>
     </div>
@@ -18,7 +18,7 @@
             color="primary"
             icon="local_shipping"
             label="Todas as Entregas"
-            size="lg"
+            size="md"
             class="full-width q-my-md"
             @click="entregas"
           />
@@ -43,7 +43,7 @@
             @click.native="entregasRealizadas"
           >
             <q-card-title class="relative-position">
-              <div class="text-faded xs-size">Realizadas</div>
+              <div class="text-faded xs-size" style="font-size: 15px;">Realizadas</div>
             </q-card-title>
             <q-card-main>
               <q-knob
@@ -51,7 +51,7 @@
                 :min="0"
                 :max="9999999"
                 color="green"
-                size="80px"
+                size="70px"
                 line-width="3px"
               >
                 <div class="s-size">{{ getNumRealizadas() }}</div>
@@ -68,7 +68,7 @@
             @click.native="entregasRetornos"
           >
             <q-card-title class="relative-position">
-              <div class="text-faded xs-size">Retornos</div>
+              <div class="text-faded xs-size" style="font-size: 15px;">Retornos</div>
             </q-card-title>
             <q-card-main>
               <q-knob
@@ -76,7 +76,7 @@
                 :min="0"
                 :max="9999999"
                 color="orange"
-                size="80px"
+                size="70px"
                 line-width="3px"
               >
                 <div class="s-size">{{ getNumRetornos() }}</div>
@@ -93,7 +93,7 @@
             @click.native="entregasPendentes"
           >
             <q-card-title class="relative-position">
-              <div class="text-faded xs-size">Pendentes</div>
+              <div class="text-faded xs-size"  style="font-size: 15px;">Pendentes</div>
             </q-card-title>
             <q-card-main>
               <q-knob
@@ -101,7 +101,7 @@
                 :min="0"
                 :max="9999999"
                 color="red"
-                size="80px"
+                size="70px"
                 line-width="3px"
               >
                 <div class="s-size">{{ getNumPendentes() }}</div>
